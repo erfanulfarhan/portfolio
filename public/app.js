@@ -28,6 +28,7 @@ const projects = [
   },
   {
     name: "Cineplex Automation Platform", repo: "https://github.com/erfanulfarhan/cineplex-bot",
+    live: "https://amigo-blurred-imaging.ngrok-free.dev",
     desc: "A Telegram bot + public web app that track cinema seat availability in real time, render seat maps, and auto-book tickets the moment they go on sale.",
     tags: ["Python", "Playwright", "aiohttp", "Telegram"],
   },
@@ -37,7 +38,8 @@ const projects = [
     tags: ["Python", "Playwright", "GitHub Actions", "Automation"],
   },
   {
-    name: "Doomsday Tracker", repo: "https://github.com/erfanulfarhan/doomsday-tracker",
+    name: "Doomsday Tracker", live: "https://doomsday-tracker.vercel.app", repo: "https://github.com/erfanulfarhan/doomsday-tracker",
+    badge: "Live",
     desc: "A polished, offline-capable watch-list web app — no backend, add-to-home-screen, all in vanilla JS.",
     tags: ["JavaScript", "PWA", "HTML/CSS"],
   },
