@@ -38,7 +38,7 @@ const projects = [
     tags: ["Python", "Playwright", "GitHub Actions", "Automation"],
   },
   {
-    name: "Doomsday Tracker", live: "https://doomsday-tracker.vercel.app", repo: "https://github.com/erfanulfarhan/doomsday-tracker",
+    name: "Doomsday Tracker", live: "https://doomsday-tracker-erfanul.vercel.app", repo: "https://github.com/erfanulfarhan/doomsday-tracker",
     badge: "Live",
     desc: "A polished, offline-capable watch-list web app — no backend, add-to-home-screen, all in vanilla JS.",
     tags: ["JavaScript", "PWA", "HTML/CSS"],
