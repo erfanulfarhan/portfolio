@@ -49,9 +49,9 @@ function voice(freq, dur, vol) {
   o.connect(g); g.connect(lp); o.start(t); o.stop(t + dur + 0.05);
 }
 const sfx = {
-  hover() { const t = performance.now(); if (t - lastHover < 110) return; lastHover = t; voice(1568, 0.5, 0.05); },
-  click() { voice(523.25, 0.7, 0.16); voice(783.99, 0.75, 0.10); },   // C5 + G5 warm chime
-  nav() { voice(392, 0.55, 0.12); voice(587.33, 0.6, 0.07); },        // G4 + D5 gentle
+  hover() { const t = performance.now(); if (t - lastHover < 220) return; lastHover = t; voice(329.63, 0.8, 0.03); },
+  click() { voice(392, 0.95, 0.08); voice(587.33, 1.0, 0.04); },      // soft warm G4 + D5
+  nav() { voice(329.63, 0.9, 0.05); voice(493.88, 0.95, 0.028); },    // gentle, soothing E4 + B4
 };
 
 /* ============ PRELOADER ============ */
@@ -199,7 +199,6 @@ addEventListener('load', () => setTimeout(computeStops, 300));
 // desktop: soft pointer glow on hover (kept flat, no 3D tilt, so orientation can't get stuck)
 if (finePointer) cards.forEach((card) => {
   const inn = card.querySelector('.pcard__in');
-  card.addEventListener('mouseenter', () => sfx.hover());
   card.addEventListener('mousemove', (e) => { const r = card.getBoundingClientRect(); inn.style.setProperty('--mx', (e.clientX - r.left) + 'px'); inn.style.setProperty('--my', (e.clientY - r.top) + 'px'); });
 });
 // mouse drag to slide the whole works track (touch keeps native scroll)
