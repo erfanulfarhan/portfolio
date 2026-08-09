@@ -9,6 +9,8 @@ const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const finePointer = matchMedia('(hover:hover) and (pointer:fine)').matches;
 const isMobile = innerWidth < 720;
+// flicker-free mode (opt-in, persisted) — applied first so no animation ever starts
+if (localStorage.getItem('calm') === '1') document.body.classList.add('calm');
 $('#yr').textContent = new Date().getFullYear();
 // always land at the top on reload (don't restore prior scroll position)
 if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual';
@@ -78,7 +80,7 @@ function preloader(done) {
 /* ============ 3D ORB (fogged depth, pauses off-screen) ============ */
 function hero3d() {
   const canvas = $('#gl'); let renderer;
-  try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' }); }
+  try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'default' }); }
   catch (e) { canvas.style.display = 'none'; return; }
   renderer.setPixelRatio(1);
   const scene = new THREE.Scene();
@@ -130,7 +132,15 @@ function hero3d() {
     renderer.render(scene, cam);
   })();
 }
-try { hero3d(); } catch (e) { $('#gl').style.display = 'none'; }
+/* ============ MOTION / FLICKER-FREE MODE ============ */
+const calmMode = document.body.classList.contains('calm');
+const mt = $('#motionToggle');
+if (mt) {
+  mt.textContent = calmMode ? 'Motion off' : 'Reduce motion';
+  mt.onclick = () => { localStorage.setItem('calm', calmMode ? '0' : '1'); location.reload(); };
+}
+if (!calmMode) { try { hero3d(); } catch (e) { $('#gl').style.display = 'none'; } }
+else { $('#gl').style.display = 'none'; }
 
 /* ============ HERO TEXT (word-split so the name never breaks mid-word) ============ */
 function heroText() {

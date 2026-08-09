@@ -37,6 +37,12 @@
   .pl-line>span{display:block;height:100%;width:0;background:linear-gradient(90deg,transparent,var(--gold));box-shadow:0 0 20px var(--gold)}
 
   nav{position:fixed;top:0;left:0;right:0;z-index:60;background:rgba(8,7,6,.9);border-bottom:1px solid var(--line)}
+  .motion-toggle{background:none;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:.32rem .8rem;font:inherit;font-size:.72rem;cursor:pointer;transition:color .2s,border-color .2s}
+  .motion-toggle:hover{color:var(--ink);border-color:var(--gold)}
+  body.calm .motion-toggle{color:var(--gold);border-color:var(--gold)}
+  /* Flicker-free mode for GPUs/drivers that tear on composited animations (common on Windows) */
+  body.calm #gl,body.calm .mesh{display:none!important}
+  body.calm *,body.calm *::before,body.calm *::after{animation:none!important}
   nav .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}
   .brand{display:inline-flex;align-items:center;gap:.6rem}
   .wm{font:800 1.32rem/1 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:-.02em;color:var(--ink);transition:opacity .2s}
@@ -73,7 +79,7 @@
   @keyframes bob{50%{transform:translate(-50%,7px)}}
 
   .marquee{overflow:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:1.2rem 0;background:linear-gradient(90deg,var(--bg2),var(--bg))}
-  .mrow{display:flex;width:max-content;white-space:nowrap;animation:marq 150s linear infinite;will-change:transform}
+  .mrow{display:flex;width:max-content;white-space:nowrap;animation:marq 150s linear infinite}
   .mrow.rev{animation-direction:reverse;opacity:.5}
   .mrow span{font-size:clamp(1.2rem,4vw,2.4rem);font-weight:850;letter-spacing:-.02em;color:transparent;-webkit-text-stroke:1px var(--faint);display:inline-flex;align-items:center;gap:2.2rem;margin-right:2.2rem}
   .mrow span.fill{color:var(--ink);-webkit-text-stroke:0}
@@ -109,7 +115,7 @@
   .track::-webkit-scrollbar{display:none}
   .pcard{scroll-snap-align:start;flex:0 0 clamp(280px,80vw,420px);position:relative}
   .pcard__in{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:1.7rem;position:relative;overflow:hidden;
-    min-height:340px;display:flex;flex-direction:column;transition:transform .3s cubic-bezier(.2,.7,.2,1),box-shadow .3s,border-color .3s;transform-style:preserve-3d}
+    min-height:340px;display:flex;flex-direction:column;transition:transform .3s cubic-bezier(.2,.7,.2,1),box-shadow .3s,border-color .3s}
   .pcard__in::before{content:"";position:absolute;inset:0;opacity:0;transition:.3s;pointer-events:none;background:radial-gradient(520px circle at var(--mx,50%) var(--my,30%),rgba(212,175,55,.20),transparent 45%)}
   .pcard__in::after{content:"";position:absolute;inset:0;border-radius:22px;padding:1px;pointer-events:none;opacity:0;transition:.3s;
     background:linear-gradient(130deg,var(--v),var(--p),var(--c));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
@@ -199,6 +205,7 @@
   <a class="brand" href="#top" aria-label="Home"><span class="wm">erfanul<span class="d">.</span></span></a>
   <div class="navr">
     <a class="nl" href="#work">Work</a><a class="nl" href="#about">About</a><a class="nl" href="#contact">Contact</a>
+    <button class="nl motion-toggle" id="motionToggle" title="If the page flickers on your device, turn this on for a static, flicker-free version">Reduce motion</button>
   </div>
 </div></nav>
 
