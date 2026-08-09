@@ -25,22 +25,26 @@ SKILLS
 - Bots & messaging: Telegram bots, email/iMessage notifications, TTS/STT voice.
 
 PROJECTS
-1. StudyBuddy — an AI study companion. Drop a PDF or paste notes to get instant
-   summaries, grounded Q&A, and auto-generated interactive quizzes. Live demo at
-   studybuddy-ai-pi.vercel.app. Stack: vanilla JS, Vercel serverless, LLM,
-   in-browser PDF parsing.
-2. Cineplex Automation Platform — a Telegram bot plus a public web app that
-   track Star Cineplex seat availability in real time, render seat maps, and can
-   book tickets automatically the moment they go on sale ("standing orders").
-   Stack: Python, Playwright, aiohttp.
-3. Result Watchers — bots that watch BRAC University and NSU admission pages and
-   a logged-in applicant portal, and alert by email/iMessage the moment results
-   publish. Handle Cloudflare challenges; run free on GitHub Actions.
-4. JARVIS — an offline-first voice assistant (wake word, local speech
-   recognition, an LLM brain, even clap-to-launch), with a natural neural
-   voice.
-5. Doomsday Tracker — a polished offline-capable web app for tracking a watch
-   list, no backend.
+1. SiteSage — an embeddable AI chat widget for ANY website. Create a bot in a
+   dashboard, train it on pasted text or web pages, and drop it in with one line
+   of code. Multi-tenant; retrieval via Postgres full-text search; answers by
+   Groq. Live at sitesage-erfanul.vercel.app.
+2. Ask My Docs — a retrieval-augmented (RAG) knowledge base. Upload a PDF or
+   paste notes, then ask questions and get answers WITH citations to the exact
+   source passage. Semantic vector search with Supabase pgvector; embeddings run
+   in the browser. Live at ask-my-docs-erfanul.vercel.app.
+3. StudyBuddy — an AI study companion. Drop a PDF or paste notes to get instant
+   summaries, grounded Q&A, and auto-generated interactive quizzes. Live at
+   studybuddy-ai-pi.vercel.app.
+4. Doomsday Tracker — a cinematic watch-tracker with accounts, cloud-synced
+   progress, a private friends-and-family leaderboard, live stats charts, and an
+   interactive animated UI. Live at doomsday-tracker-erfanul.vercel.app.
+5. Cineplex Automation Platform — a Telegram bot plus a public web app that
+   track cinema seat availability in real time, render seat maps, and can book
+   tickets automatically the moment they go on sale. Stack: Python, Playwright.
+6. Result Watchers — bots that watch university admission pages and a logged-in
+   applicant portal, and alert by email/iMessage the moment results publish. Run
+   free on GitHub Actions.
 
 CONTACT: via the Contact section / GitHub github.com/erfanulfarhan.
 `;
