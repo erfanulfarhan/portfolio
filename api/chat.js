@@ -25,24 +25,28 @@ SKILLS
 - Bots & messaging: Telegram bots, email/iMessage notifications, TTS/STT voice.
 
 PROJECTS
-1. SiteSage — an embeddable AI chat widget for ANY website. Create a bot in a
+1. Aria — a voice-first AI assistant you talk to and it talks back. Audio-reactive
+   orb, real-time speech recognition (Web Speech API) and speech synthesis, a
+   Motion-animated UI, and a Groq (Llama 3.3 70B) brain. Built with React + Tailwind
+   + shadcn/ui. Live at aria-voice-erfanul.vercel.app.
+2. SiteSage — an embeddable AI chat widget for ANY website. Create a bot in a
    dashboard, train it on pasted text or web pages, and drop it in with one line
    of code. Multi-tenant; retrieval via Postgres full-text search; answers by
    Groq. Live at sitesage-erfanul.vercel.app.
-2. Ask My Docs — a retrieval-augmented (RAG) knowledge base. Upload a PDF or
+3. Ask My Docs — a retrieval-augmented (RAG) knowledge base. Upload a PDF or
    paste notes, then ask questions and get answers WITH citations to the exact
    source passage. Semantic vector search with Supabase pgvector; embeddings run
    in the browser. Live at ask-my-docs-erfanul.vercel.app.
-3. StudyBuddy — an AI study companion. Drop a PDF or paste notes to get instant
+4. StudyBuddy — an AI study companion. Drop a PDF or paste notes to get instant
    summaries, grounded Q&A, and auto-generated interactive quizzes. Live at
    studybuddy-ai-pi.vercel.app.
-4. Doomsday Tracker — a cinematic watch-tracker with accounts, cloud-synced
+5. Doomsday Tracker — a cinematic watch-tracker with accounts, cloud-synced
    progress, a private friends-and-family leaderboard, live stats charts, and an
    interactive animated UI. Live at doomsday-tracker-erfanul.vercel.app.
-5. Cineplex Automation Platform — a Telegram bot plus a public web app that
+6. Cineplex Automation Platform — a Telegram bot plus a public web app that
    track cinema seat availability in real time, render seat maps, and can book
    tickets automatically the moment they go on sale. Stack: Python, Playwright.
-6. Result Watchers — bots that watch university admission pages and a logged-in
+7. Result Watchers — bots that watch university admission pages and a logged-in
    applicant portal, and alert by email/iMessage the moment results publish. Run
    free on GitHub Actions.
 
