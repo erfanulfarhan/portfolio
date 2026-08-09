@@ -98,7 +98,7 @@ function hero3d() {
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
   geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
-  const pts = new THREE.Points(geo, new THREE.PointsMaterial({ size: 0.04, vertexColors: true, transparent: true, opacity: .95, blending: THREE.AdditiveBlending, depthWrite: false, fog: true }));
+  const pts = new THREE.Points(geo, new THREE.PointsMaterial({ size: 0.038, vertexColors: true, transparent: true, opacity: .8, blending: THREE.AdditiveBlending, depthWrite: false, fog: true }));
   group.add(pts);
   const wire = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.IcosahedronGeometry(1.4, 1)), new THREE.LineBasicMaterial({ color: 0xd4af37, transparent: true, opacity: .3, fog: true }));
   group.add(wire);
@@ -204,10 +204,11 @@ if (finePointer) cards.forEach((card) => {
 });
 // mouse drag to slide the whole works track (touch keeps native scroll)
 let down = false, moved = 0, sx = 0, sl = 0;
-track.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse') return; down = true; moved = 0; sx = e.clientX; sl = track.scrollLeft; track.classList.add('grabbing'); });
+track.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse') return; down = true; moved = 0; sx = e.clientX; sl = track.scrollLeft; track.classList.add('grabbing'); e.preventDefault(); });
 addEventListener('pointermove', (e) => { if (!down) return; const dx = e.clientX - sx; moved = Math.max(moved, Math.abs(dx)); track.scrollLeft = sl - dx; });
 const endDrag = () => { if (down) { down = false; track.classList.remove('grabbing'); } };
 addEventListener('pointerup', endDrag); addEventListener('pointercancel', endDrag);
+track.addEventListener('dragstart', (e) => e.preventDefault());  // no native image/text drag
 track.addEventListener('click', (e) => { if (moved > 6) { e.preventDefault(); e.stopPropagation(); } }, true);  // suppress click after a drag
 requestAnimationFrame(updateActive);
 
