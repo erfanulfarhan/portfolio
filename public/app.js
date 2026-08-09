@@ -21,6 +21,12 @@ let ri = 0, ci = 0, deleting = false;
 // ---- projects ----
 const projects = [
   {
+    name: "SiteSage", live: "https://sitesage-erfanul.vercel.app",
+    repo: "https://github.com/erfanulfarhan/sitesage",
+    desc: "An embeddable AI chat widget for any website — create a bot, train it on your text or web pages, and drop it in with one line of code. Multi-tenant, with a config dashboard and a tiny dependency-free widget.",
+    tags: ["Multi-tenant", "Widget", "Postgres FTS", "Groq"], badge: "Live",
+  },
+  {
     name: "Ask My Docs", live: "https://ask-my-docs-erfanul.vercel.app",
     repo: "https://github.com/erfanulfarhan/ask-my-docs",
     desc: "A retrieval-augmented (RAG) knowledge base — upload a PDF or paste notes, then get answers grounded in your sources with clickable citations to the exact passage. Semantic vector search; embeddings run in the browser.",
