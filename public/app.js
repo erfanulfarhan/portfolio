@@ -21,6 +21,12 @@ let ri = 0, ci = 0, deleting = false;
 // ---- projects ----
 const projects = [
   {
+    name: "Ask My Docs", live: "https://ask-my-docs-erfanul.vercel.app",
+    repo: "https://github.com/erfanulfarhan/ask-my-docs",
+    desc: "A retrieval-augmented (RAG) knowledge base — upload a PDF or paste notes, then get answers grounded in your sources with clickable citations to the exact passage. Semantic vector search; embeddings run in the browser.",
+    tags: ["RAG", "pgvector", "Embeddings", "Groq"], badge: "Live",
+  },
+  {
     name: "StudyBuddy", live: "https://studybuddy-ai-pi.vercel.app",
     repo: "https://github.com/erfanulfarhan/studybuddy-ai",
     desc: "An AI study companion — drop a PDF or paste notes to get instant summaries, grounded Q&A, and auto-generated interactive quizzes.",
@@ -40,8 +46,8 @@ const projects = [
   {
     name: "Doomsday Tracker", live: "https://doomsday-tracker-erfanul.vercel.app", repo: "https://github.com/erfanulfarhan/doomsday-tracker",
     badge: "Live",
-    desc: "A polished, offline-capable watch-list web app — no backend, add-to-home-screen, all in vanilla JS.",
-    tags: ["JavaScript", "PWA", "HTML/CSS"],
+    desc: "A cinematic Avengers watch-tracker: accounts with cloud-synced progress, a private friends-&-family leaderboard, live stats charts, spoiler-gated notes, and an interactive animated UI.",
+    tags: ["Supabase", "Auth", "Charts", "Animation"],
   },
 ];
 $("#cards").innerHTML = projects.map((p) => `
