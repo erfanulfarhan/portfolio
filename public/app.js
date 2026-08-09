@@ -80,13 +80,13 @@ function hero3d() {
   const canvas = $('#gl'); let renderer;
   try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' }); }
   catch (e) { canvas.style.display = 'none'; return; }
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
+  renderer.setPixelRatio(1);
   const scene = new THREE.Scene();
   scene.fog = new THREE.FogExp2(new THREE.Color('#080706'), 0.13);   // depth: far points fade to bg
   const cam = new THREE.PerspectiveCamera(60, 1, 0.1, 100); cam.position.z = 5.6;
   const group = new THREE.Group(); scene.add(group);
 
-  const N = reduce ? 700 : (isMobile ? 1100 : 2000), R = 2.35;
+  const N = reduce ? 600 : (isMobile ? 900 : 1400), R = 2.35;
   const pos = new Float32Array(N * 3), col = new Float32Array(N * 3);
   const cA = new THREE.Color('#f7e6a6'), cB = new THREE.Color('#d4af37'), cC = new THREE.Color('#8a6a1f');
   for (let i = 0; i < N; i++) {
@@ -110,10 +110,18 @@ function hero3d() {
 
   let visible = true;
   new IntersectionObserver(([e]) => { visible = e.isIntersecting; }).observe($('header'));
+  // Auto-degrade: sample FPS for ~1.4s; if the GPU can't keep up (weak PC / no HW
+  // acceleration), drop the orb so the rest of the site stays smooth on any device.
+  let alive = true, frames = 0, probeStart = 0;
   let t = 0;
-  (function loop() {
+  (function loop(ts) {
+    if (!alive) return;
     requestAnimationFrame(loop);
     if (!visible) return;                       // skip render when hero scrolled away
+    if (!probeStart) probeStart = ts || performance.now();
+    else { frames++; const dt = (ts || performance.now()) - probeStart;
+      if (dt > 1400) { const fps = frames * 1000 / dt;
+        if (fps < 40) { alive = false; canvas.style.display = 'none'; document.body.classList.add('lite'); return; } } }
     t += 0.004; mo.x += (mo.tx - mo.x) * 0.04; mo.y += (mo.ty - mo.y) * 0.04;
     group.rotation.y += 0.0012 + mo.x * 0.015;
     group.rotation.x += (mo.y * 0.4 - group.rotation.x) * 0.04;

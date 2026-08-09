@@ -51,12 +51,10 @@
 
   header{position:relative;min-height:100svh;display:flex;align-items:center;overflow:hidden}
   #gl{position:absolute;inset:0;z-index:1}
-  .mesh{position:absolute;inset:-30%;z-index:0;filter:blur(85px);opacity:.3;
+  .mesh{position:absolute;inset:-30%;z-index:0;filter:blur(55px);opacity:.3;
     background:radial-gradient(40% 40% at 25% 30%,rgba(230,193,90,.34),transparent 60%),
       radial-gradient(40% 40% at 75% 40%,rgba(212,175,55,.26),transparent 60%),
-      radial-gradient(45% 45% at 55% 75%,rgba(201,154,46,.22),transparent 60%);
-    animation:mesh 26s ease-in-out infinite}
-  @keyframes mesh{0%,100%{transform:rotate(0) scale(1)}50%{transform:rotate(20deg) scale(1.15)}}
+      radial-gradient(45% 45% at 55% 75%,rgba(201,154,46,.22),transparent 60%)}
   .hero{position:relative;z-index:3;pointer-events:none;width:100%}
   .hero .in{pointer-events:auto;max-width:min(100%,780px)}
   .hello{color:var(--c);font-weight:600;letter-spacing:.14em;text-transform:uppercase;font-size:.78rem;opacity:0;transform:translateY(12px)}
@@ -176,7 +174,7 @@
     section{padding:4rem 0}
     header{min-height:92svh}
     #gl{opacity:.42}
-    .mesh{opacity:.28;filter:blur(70px)}
+    .mesh{opacity:.28;filter:blur(45px)}
     .hero .in{max-width:100%}
     .lead{max-width:100%}
     .cta{gap:.6rem}
