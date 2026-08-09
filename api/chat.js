@@ -26,9 +26,9 @@ SKILLS
 
 PROJECTS
 1. Friday — a voice-first AI assistant you talk to and it talks back. Audio-reactive
-   orb, real-time speech recognition (Web Speech API) and speech synthesis, a
-   Motion-animated UI, and a Groq (Llama 3.3 70B) brain. Built with React + Tailwind
-   + shadcn/ui. Live at friday-erfanul.vercel.app.
+   orb, speech-to-text via Groq Whisper and browser speech synthesis, a Motion-animated
+   UI, and a Groq (Llama 3.3 70B) brain. Built with React + Tailwind + shadcn/ui.
+   Live at friday-erfanul.vercel.app.
 2. SiteSage — an embeddable AI chat widget for ANY website. Create a bot in a
    dashboard, train it on pasted text or web pages, and drop it in with one line
    of code. Multi-tenant; retrieval via Postgres full-text search; answers by

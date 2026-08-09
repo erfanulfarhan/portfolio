@@ -147,7 +147,7 @@ $('#mrow2').innerHTML = rowHTML(false).repeat(2);
 
 /* ============ CAROUSEL (coverflow + dots + swipe) ============ */
 const projects = [
-  { name: 'Friday', live: 'https://friday-erfanul.vercel.app', repo: 'https://github.com/erfanulfarhan/friday-voice', b: 1, desc: 'A voice-first AI assistant — talk to it and it talks back. Audio-reactive orb, real-time speech recognition and synthesis, powered by Llama 3.3 70B.', tags: ['React', 'Web Speech API', 'Motion', 'Groq'] },
+  { name: 'Friday', live: 'https://friday-erfanul.vercel.app', repo: 'https://github.com/erfanulfarhan/friday-voice', b: 1, desc: 'A voice-first AI assistant — talk to it and it talks back. Audio-reactive orb, real-time speech recognition and synthesis, powered by Llama 3.3 70B.', tags: ['React', 'Whisper STT', 'Motion', 'Groq'] },
   { name: 'SiteSage', live: 'https://sitesage-erfanul.vercel.app', repo: 'https://github.com/erfanulfarhan/sitesage', b: 1, desc: 'An embeddable AI chat widget for any website — create a bot, train it on text or web pages, drop it in with one line of code. Multi-tenant.', tags: ['Multi-tenant', 'Widget', 'Postgres FTS', 'Groq'] },
   { name: 'Ask My Docs', live: 'https://ask-my-docs-erfanul.vercel.app', repo: 'https://github.com/erfanulfarhan/ask-my-docs', b: 1, desc: 'A RAG knowledge base — answers with citations to the exact source passage. Semantic vector search; embeddings run in the browser.', tags: ['RAG', 'pgvector', 'Embeddings', 'Groq'] },
   { name: 'StudyBuddy', live: 'https://studybuddy-ai-pi.vercel.app', repo: 'https://github.com/erfanulfarhan/studybuddy-ai', b: 1, desc: 'An AI study companion — instant summaries, grounded Q&A, and auto-generated interactive quizzes from a PDF or notes.', tags: ['AI', 'Vercel', 'pdf.js', 'Vanilla JS'] },
