@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<title>Erfanul Hakim Farhan — AI &amp; Automation Developer</title>
-<meta name="description" content="Erfanul Hakim Farhan — AI &amp; Automation Developer. An immersive portfolio of AI web apps, RAG systems, and automation. Interactive 3D, sound, motion.">
+<title>Erfanul Hakim Farhan | AI &amp; Automation Developer</title>
+<meta name="description" content="Erfanul Hakim Farhan | AI &amp; Automation Developer. An immersive portfolio of AI web apps, RAG systems, and automation. Interactive 3D, sound, motion.">
 <style>
   :root{
     --bg:#080706; --bg2:#0e0c09; --card:#14110b; --ink:#f6efdd; --muted:#a99f86; --faint:#6a6150;
@@ -75,7 +75,7 @@
   @keyframes bob{50%{transform:translate(-50%,7px)}}
 
   .marquee{overflow:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:1.2rem 0;background:linear-gradient(90deg,var(--bg2),var(--bg))}
-  .mrow{display:flex;gap:2.2rem;width:max-content;white-space:nowrap;animation:marq 32s linear infinite}
+  .mrow{display:flex;gap:2.2rem;width:max-content;white-space:nowrap;animation:marq 90s linear infinite}
   .mrow.rev{animation-direction:reverse;opacity:.5}
   .mrow span{font-size:clamp(1.2rem,4vw,2.4rem);font-weight:850;letter-spacing:-.02em;color:transparent;-webkit-text-stroke:1px var(--faint);display:inline-flex;align-items:center;gap:2.2rem}
   .mrow span.fill{color:var(--ink);-webkit-text-stroke:0}
@@ -92,20 +92,31 @@
 
   .work h2 span{color:var(--faint);font-weight:400;font-size:.42em;letter-spacing:0}
   .carousel{position:relative;margin-top:1.5rem}
+  .drag-hint{position:absolute;top:1.1rem;left:50%;transform:translateX(-50%);z-index:5;pointer-events:none;
+    display:flex;align-items:center;gap:.4rem;padding:.45rem .95rem;border-radius:999px;
+    background:rgba(20,17,11,.72);border:1px solid var(--line);color:var(--ink);font-size:.76rem;
+    font-weight:600;letter-spacing:.06em;text-transform:uppercase;backdrop-filter:blur(8px);
+    opacity:0;transition:opacity .35s ease}
+  .carousel:hover .drag-hint{opacity:.92;animation:hintbob 2s ease-in-out infinite}
+  .track.grabbing ~ .drag-hint{opacity:0!important;animation:none}
+  @keyframes hintbob{50%{letter-spacing:.14em}}
+  @media (hover:none){.drag-hint{display:none}}
   .track{display:flex;gap:1.2rem;overflow-x:auto;
     padding:2rem 1.4rem 2rem max(1.4rem,calc((100vw - 1180px)/2 + 1.4rem));
     scroll-snap-type:x mandatory;scroll-padding-left:max(1.4rem,calc((100vw - 1180px)/2 + 1.4rem));
-    scrollbar-width:none;perspective:1600px;-webkit-overflow-scrolling:touch}
+    scrollbar-width:none;-webkit-overflow-scrolling:touch;cursor:grab}
+  .track.grabbing{cursor:grabbing}
+  .track.grabbing .pcard{pointer-events:none}
   .track::-webkit-scrollbar{display:none}
   .pcard{scroll-snap-align:start;flex:0 0 clamp(280px,80vw,420px);position:relative}
   .pcard__in{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:1.7rem;position:relative;overflow:hidden;
     min-height:340px;display:flex;flex-direction:column;transition:transform .3s cubic-bezier(.2,.7,.2,1),box-shadow .3s,border-color .3s;transform-style:preserve-3d}
-  .pcard__in::before{content:"";position:absolute;inset:0;opacity:0;transition:.3s;pointer-events:none;background:radial-gradient(520px circle at var(--mx,50%) var(--my,30%),rgba(236,72,153,.22),transparent 45%)}
+  .pcard__in::before{content:"";position:absolute;inset:0;opacity:0;transition:.3s;pointer-events:none;background:radial-gradient(520px circle at var(--mx,50%) var(--my,30%),rgba(212,175,55,.20),transparent 45%)}
   .pcard__in::after{content:"";position:absolute;inset:0;border-radius:22px;padding:1px;pointer-events:none;opacity:0;transition:.3s;
     background:linear-gradient(130deg,var(--v),var(--p),var(--c));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
   .pcard:hover .pcard__in::before,.pcard:hover .pcard__in::after{opacity:1}
-  .pcard:hover .pcard__in{border-color:#2c2a55;box-shadow:0 34px 80px rgba(0,0,0,.6)}
-  .num{position:absolute;top:.9rem;right:1.3rem;font-size:3.2rem;font-weight:850;letter-spacing:-.05em;color:transparent;-webkit-text-stroke:1px #26244a;z-index:1}
+  .pcard:hover .pcard__in{border-color:var(--gold);box-shadow:0 30px 70px rgba(0,0,0,.6);transform:translateY(-6px)}
+  .num{position:absolute;top:.9rem;right:1.3rem;font-size:3.2rem;font-weight:850;letter-spacing:-.05em;color:transparent;-webkit-text-stroke:1px #3a2f16;z-index:1}
   .live{display:inline-flex;align-items:center;gap:.4rem;color:#34d399;font-size:.78rem;font-weight:600;margin-bottom:.6rem;position:relative;z-index:1}
   .dot{width:8px;height:8px;border-radius:50%;background:#34d399;box-shadow:0 0 0 0 rgba(52,211,153,.6);animation:pulse 1.8s infinite}
   @keyframes pulse{70%{box-shadow:0 0 0 8px rgba(52,211,153,0)}100%{box-shadow:0 0 0 0 rgba(52,211,153,0)}}
@@ -199,7 +210,7 @@
     <div class="hello" id="hello">AI &amp; Automation Developer</div>
     <h1 id="title"></h1>
     <div class="role" id="role"></div>
-    <p class="lead" id="lead">I build AI-powered web apps, RAG systems, and automation that watches, alerts, and acts — designed, built, and shipped live.</p>
+    <p class="lead" id="lead">I build AI-powered web apps, RAG systems, and automation that watches, alerts, and acts. Designed, built, and shipped live.</p>
     <div class="cta" id="cta">
       <button class="btn primary" data-magnetic data-scroll="#work">View my work</button>
       <a class="btn ghost" data-magnetic href="mailto:erfanul100@gmail.com">Hire me</a>
@@ -211,17 +222,18 @@
 <div class="marquee" aria-hidden="true"><div class="mrow" id="mrow1"></div><div class="mrow rev" id="mrow2"></div></div>
 
 <section class="work" id="work">
-  <div class="wrap"><span class="eyebrow reveal">Selected work</span><h2 data-reveal-line>Things I've shipped <span>— swipe or use the arrows</span></h2></div>
+  <div class="wrap"><span class="eyebrow reveal">Selected work</span><h2 data-reveal-line>Things I've shipped <span>(drag or swipe)</span></h2></div>
   <div class="carousel">
     <div class="track" id="track"></div>
+    <div class="drag-hint" id="dragHint" aria-hidden="true">← &nbsp;drag to slide&nbsp; →</div>
     <div class="carbtns"><button id="prev" data-magnetic aria-label="Previous">←</button><div class="dots" id="dots"></div><button id="next" data-magnetic aria-label="Next">→</button></div>
   </div>
 </section>
 
 <section class="about" id="about">
   <div class="wrap">
-    <span class="eyebrow reveal">About</span><h2 data-reveal-line>I turn ideas into live products — fast.</h2>
-    <p class="reveal">From RAG knowledge bases and embeddable AI widgets to automation bots and full-stack apps with auth, real-time data, and analytics — I design it, build it, and deploy it.</p>
+    <span class="eyebrow reveal">About</span><h2 data-reveal-line>I turn ideas into live products, fast.</h2>
+    <p class="reveal">From RAG knowledge bases and embeddable AI widgets to automation bots and full-stack apps with auth, real-time data, and analytics. I design it, build it, and deploy it.</p>
     <div class="stats reveal">
       <div class="stat"><b data-count="6">0</b><span>Live products</span></div>
       <div class="stat"><b data-count="100">0</b><span>% shipped &amp; deployed</span></div>
@@ -233,7 +245,7 @@
 
 <section class="contact" id="contact">
   <div class="wrap"><span class="eyebrow reveal">Contact</span><h2 data-reveal-line>Let's build something.</h2>
-    <p class="reveal">Have a project in mind — an AI feature, an automation, a full app? Send me a message.</p>
+    <p class="reveal">Have a project in mind, whether an AI feature, an automation, or a full app? Send me a message.</p>
     <form class="cform reveal" id="cform" novalidate>
       <div class="crow">
         <input name="name" placeholder="Your name" autocomplete="name" required>

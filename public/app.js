@@ -1,4 +1,4 @@
-/* Immersive portfolio — optimized. Native smooth-scroll, sound-on-by-default,
+/* Immersive portfolio, optimized. Native smooth-scroll, sound-on-by-default,
    a depth-fogged Three.js orb that pauses when off-screen, masked reveals, an
    infinite marquee, a coverflow carousel (swipe + dots), and the Groq chat. */
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
@@ -147,10 +147,10 @@ $('#mrow2').innerHTML = rowHTML(false).repeat(2);
 
 /* ============ CAROUSEL (coverflow + dots + swipe) ============ */
 const projects = [
-  { name: 'Friday', live: 'https://friday-erfanul.vercel.app', repo: 'https://github.com/erfanulfarhan/friday-voice', b: 1, desc: 'A voice-first AI assistant — talk to it and it talks back. Audio-reactive orb, real-time speech recognition and synthesis, powered by Llama 3.3 70B.', tags: ['React', 'Whisper STT', 'Motion', 'Groq'] },
-  { name: 'SiteSage', live: 'https://sitesage-erfanul.vercel.app', repo: 'https://github.com/erfanulfarhan/sitesage', b: 1, desc: 'An embeddable AI chat widget for any website — create a bot, train it on text or web pages, drop it in with one line of code. Multi-tenant.', tags: ['Multi-tenant', 'Widget', 'Postgres FTS', 'Groq'] },
-  { name: 'Ask My Docs', live: 'https://ask-my-docs-erfanul.vercel.app', repo: 'https://github.com/erfanulfarhan/ask-my-docs', b: 1, desc: 'A RAG knowledge base — answers with citations to the exact source passage. Semantic vector search; embeddings run in the browser.', tags: ['RAG', 'pgvector', 'Embeddings', 'Groq'] },
-  { name: 'StudyBuddy', live: 'https://studybuddy-ai-pi.vercel.app', repo: 'https://github.com/erfanulfarhan/studybuddy-ai', b: 1, desc: 'An AI study companion — instant summaries, grounded Q&A, and auto-generated interactive quizzes from a PDF or notes.', tags: ['AI', 'Vercel', 'pdf.js', 'Vanilla JS'] },
+  { name: 'Friday', live: 'https://friday-erfanul.vercel.app', repo: 'https://github.com/erfanulfarhan/friday-voice', b: 1, desc: 'A voice-first AI assistant you talk to and it talks back. Audio-reactive orb, real-time speech recognition and synthesis, powered by Llama 3.3 70B.', tags: ['React', 'Whisper STT', 'Motion', 'Groq'] },
+  { name: 'SiteSage', live: 'https://sitesage-erfanul.vercel.app', repo: 'https://github.com/erfanulfarhan/sitesage', b: 1, desc: 'An embeddable AI chat widget for any website: create a bot, train it on text or web pages, drop it in with one line of code. Multi-tenant.', tags: ['Multi-tenant', 'Widget', 'Postgres FTS', 'Groq'] },
+  { name: 'Ask My Docs', live: 'https://ask-my-docs-erfanul.vercel.app', repo: 'https://github.com/erfanulfarhan/ask-my-docs', b: 1, desc: 'A RAG knowledge base that answers with citations to the exact source passage. Semantic vector search; embeddings run in the browser.', tags: ['RAG', 'pgvector', 'Embeddings', 'Groq'] },
+  { name: 'StudyBuddy', live: 'https://studybuddy-ai-pi.vercel.app', repo: 'https://github.com/erfanulfarhan/studybuddy-ai', b: 1, desc: 'An AI study companion: instant summaries, grounded Q&A, and auto-generated interactive quizzes from a PDF or notes.', tags: ['AI', 'Vercel', 'pdf.js', 'Vanilla JS'] },
   { name: 'Doomsday Tracker', live: 'https://doomsday-tracker-erfanul.vercel.app', repo: 'https://github.com/erfanulfarhan/doomsday-tracker', b: 1, desc: 'A cinematic watch-tracker: accounts with cloud-synced progress, a private leaderboard, live charts, and an animated UI.', tags: ['Supabase', 'Auth', 'Charts', 'Animation'] },
   { name: 'Cineplex Automation', live: 'https://amigo-blurred-imaging.ngrok-free.dev', repo: 'https://github.com/erfanulfarhan/cineplex-bot', desc: 'A Telegram bot + web app tracking cinema seats in real time, rendering seat maps, and auto-booking tickets on sale.', tags: ['Python', 'Playwright', 'aiohttp', 'Telegram'] },
   { name: 'Result Watchers', repo: 'https://github.com/erfanulfarhan/bracu-result-watch', desc: 'Bots that watch university result pages and a logged-in portal, alerting the instant results publish. Free on GitHub Actions.', tags: ['Python', 'Playwright', 'GitHub Actions'] },
@@ -171,7 +171,7 @@ const dotsWrap = $('#dots');
 let dots = [], stops = [], cflRaf = 0, rzT = 0;
 const padL = () => parseFloat(getComputedStyle(track).paddingLeft) || 0;
 function setDot(a) { dots.forEach((d, i) => d.classList.toggle('on', i === a)); }
-// Reachable scroll positions only — cards that can't reach the left edge
+// Reachable scroll positions only. Cards that can't reach the left edge
 // collapse into a single "end" stop, so there are no phantom/empty dots.
 function computeStops() {
   const max = Math.max(0, track.scrollWidth - track.clientWidth), pl = padL();
@@ -196,18 +196,19 @@ $('#prev').onclick = () => goStop(currentStop() - 1);
 addEventListener('resize', () => { clearTimeout(rzT); rzT = setTimeout(computeStops, 200); });
 computeStops();
 addEventListener('load', () => setTimeout(computeStops, 300));
-// desktop hover tilt (outer transform; coverflow scales the inner element → no conflict)
+// desktop: soft pointer glow on hover (kept flat — no 3D tilt, so orientation can't get stuck)
 if (finePointer) cards.forEach((card) => {
   const inn = card.querySelector('.pcard__in');
   card.addEventListener('mouseenter', () => sfx.hover());
-  card.addEventListener('mousemove', (e) => { const r = card.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top; inn.style.setProperty('--mx', x + 'px'); inn.style.setProperty('--my', y + 'px'); card.style.transform = `rotateX(${(y / r.height - .5) * -7}deg) rotateY(${(x / r.width - .5) * 9}deg)`; });
-  card.addEventListener('mouseleave', () => (card.style.transform = ''));
-  // mouse drag to scroll (touch uses native scroll)
-  let down = false, sx = 0, sl = 0;
-  card.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse') return; down = true; sx = e.clientX; sl = track.scrollLeft; });
-  addEventListener('pointermove', (e) => { if (down) track.scrollLeft = sl - (e.clientX - sx); });
-  addEventListener('pointerup', () => (down = false));
+  card.addEventListener('mousemove', (e) => { const r = card.getBoundingClientRect(); inn.style.setProperty('--mx', (e.clientX - r.left) + 'px'); inn.style.setProperty('--my', (e.clientY - r.top) + 'px'); });
 });
+// mouse drag to slide the whole works track (touch keeps native scroll)
+let down = false, moved = 0, sx = 0, sl = 0;
+track.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse') return; down = true; moved = 0; sx = e.clientX; sl = track.scrollLeft; track.classList.add('grabbing'); });
+addEventListener('pointermove', (e) => { if (!down) return; const dx = e.clientX - sx; moved = Math.max(moved, Math.abs(dx)); track.scrollLeft = sl - dx; });
+const endDrag = () => { if (down) { down = false; track.classList.remove('grabbing'); } };
+addEventListener('pointerup', endDrag); addEventListener('pointercancel', endDrag);
+track.addEventListener('click', (e) => { if (moved > 6) { e.preventDefault(); e.stopPropagation(); } }, true);  // suppress click after a drag
 requestAnimationFrame(updateActive);
 
 /* ============ REVEALS / STATS / CHIPS ============ */
@@ -232,7 +233,7 @@ async function send() {
   input.value = ''; add('user', text); chatHist.push({ role: 'user', text });
   const think = add('assistant', '…');
   try { const r = await fetch('/api/chat', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ message: text, history: chatHist.slice(0, -1) }) }); const d = await r.json(); think.textContent = r.ok ? d.text : '⚠️ ' + (d.error || 'Something went wrong.'); if (r.ok) chatHist.push({ role: 'assistant', text: d.text }); }
-  catch { think.textContent = '⚠️ Network error — try again.'; }
+  catch { think.textContent = '⚠️ Network error. Try again.'; }
 }
 $('#csend').onclick = send; $('#cin').addEventListener('keydown', (e) => { if (e.key === 'Enter') send(); });
 
@@ -250,9 +251,9 @@ if (cform) cform.addEventListener('submit', async (e) => {
   try {
     const r = await fetch('/api/contact', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(data) });
     const d = await r.json().catch(() => ({}));
-    if (r.ok) { status.textContent = "Thanks — your message is on its way. I'll get back to you soon."; status.classList.add('ok'); cform.reset(); }
-    else { status.textContent = '⚠️ ' + (d.error || 'Could not send — please email me directly.'); status.classList.add('err'); }
-  } catch { status.textContent = '⚠️ Network error — please email me directly.'; status.classList.add('err'); }
+    if (r.ok) { status.textContent = "Thanks! Your message is on its way. I'll get back to you soon."; status.classList.add('ok'); cform.reset(); }
+    else { status.textContent = '⚠️ ' + (d.error || 'Could not send. Please email me directly.'); status.classList.add('err'); }
+  } catch { status.textContent = '⚠️ Network error. Please email me directly.'; status.classList.add('err'); }
   btn.disabled = false; btn.textContent = label;
 });
 
