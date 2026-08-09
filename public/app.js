@@ -10,6 +10,10 @@ const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const finePointer = matchMedia('(hover:hover) and (pointer:fine)').matches;
 const isMobile = innerWidth < 720;
 $('#yr').textContent = new Date().getFullYear();
+// always land at the top on reload (don't restore prior scroll position)
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+scrollTo(0, 0);
+addEventListener('load', () => scrollTo(0, 0));
 
 function goTo(sel) { const t = $(sel); if (t) t.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' }); }
 
