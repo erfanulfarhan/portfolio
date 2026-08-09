@@ -14,45 +14,61 @@ $('#yr').textContent = new Date().getFullYear();
 function goTo(sel) { const t = $(sel); if (t) t.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' }); }
 
 /* ============ SOUND (on by default, armed on first gesture) ============ */
-let AC = null, master = null, soundOn = false, lastHover = 0;
+let AC = null, master = null, lp = null, reverbSend = null, soundOn = false, lastHover = 0;
+function makeImpulse(dur, decay) {
+  const rate = AC.sampleRate, len = Math.floor(rate * dur), buf = AC.createBuffer(2, len, rate);
+  for (let ch = 0; ch < 2; ch++) { const d = buf.getChannelData(ch); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay); }
+  return buf;
+}
 function armAudio() {
   if (AC) { if (AC.state === 'suspended') AC.resume(); return; }
   try {
     AC = new (window.AudioContext || window.webkitAudioContext)();
-    master = AC.createGain(); master.gain.value = 0.14; master.connect(AC.destination);
+    master = AC.createGain(); master.gain.value = 0.5; master.connect(AC.destination);
+    lp = AC.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2400; lp.Q.value = 0.3; lp.connect(master);
+    const conv = AC.createConvolver(); conv.buffer = makeImpulse(1.8, 2.4);
+    const wet = AC.createGain(); wet.gain.value = 0.9; conv.connect(wet); wet.connect(master);
+    reverbSend = AC.createGain(); reverbSend.gain.value = 0.35; reverbSend.connect(conv); lp.connect(reverbSend);
     soundOn = true;
   } catch (e) {}
 }
 addEventListener('pointerdown', armAudio, { once: true });
 addEventListener('keydown', armAudio, { once: true });
-function tone(freq, dur, type = 'sine', vol = 0.4) {
+// soft, warm sine "voice" with gentle attack + long release → premium, spacious with reverb
+function voice(freq, dur, vol) {
   if (!soundOn || !AC) return;
-  const o = AC.createOscillator(), g = AC.createGain(); o.type = type; o.frequency.value = freq;
-  g.gain.setValueAtTime(0.0001, AC.currentTime); g.gain.exponentialRampToValueAtTime(vol, AC.currentTime + 0.008);
-  g.gain.exponentialRampToValueAtTime(0.0001, AC.currentTime + dur);
-  o.connect(g); g.connect(master); o.start(); o.stop(AC.currentTime + dur + 0.02);
+  const o = AC.createOscillator(), g = AC.createGain(), t = AC.currentTime;
+  o.type = 'sine'; o.frequency.value = freq;
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(vol, t + 0.03);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g); g.connect(lp); o.start(t); o.stop(t + dur + 0.05);
 }
-function whoosh() {
-  if (!soundOn || !AC) return;
-  const n = AC.sampleRate * 0.2, buf = AC.createBuffer(1, n, AC.sampleRate), d = buf.getChannelData(0);
-  for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n);
-  const src = AC.createBufferSource(); src.buffer = buf;
-  const bp = AC.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.setValueAtTime(500, AC.currentTime);
-  bp.frequency.exponentialRampToValueAtTime(2400, AC.currentTime + 0.16);
-  const g = AC.createGain(); g.gain.value = 0.4; src.connect(bp); bp.connect(g); g.connect(master); src.start();
-}
-const sfx = { hover() { const t = performance.now(); if (t - lastHover < 70) return; lastHover = t; tone(1150, 0.05, 'sine', 0.18); }, nav() { whoosh(); }, click() { tone(540, 0.09, 'triangle', 0.32); } };
+const sfx = {
+  hover() { const t = performance.now(); if (t - lastHover < 110) return; lastHover = t; voice(1568, 0.5, 0.05); },
+  click() { voice(523.25, 0.7, 0.16); voice(783.99, 0.75, 0.10); },   // C5 + G5 warm chime
+  nav() { voice(392, 0.55, 0.12); voice(587.33, 0.6, 0.07); },        // G4 + D5 gentle
+};
 
 /* ============ PRELOADER ============ */
 function preloader(done) {
-  const c = $('#pcount'), bar = $('#prebar');
+  const mono = $('#plMono'), line = $('#plline'), pct = $('#plpct');
   if (reduce) { $('#preload').classList.add('done'); done(); return; }
-  let n = 0;
+  let p = 0, loaded = document.readyState === 'complete';
+  addEventListener('load', () => { loaded = true; });
+  setTimeout(() => { loaded = true; }, 4500);        // safety, never hang
   const id = setInterval(() => {
-    n += Math.random() * 11 + 6;
-    if (n >= 100) { n = 100; clearInterval(id); c.textContent = 100; bar.style.width = '100%'; setTimeout(() => { $('#preload').classList.add('done'); done(); }, 300); }
-    c.textContent = Math.floor(n); bar.style.width = n + '%';
-  }, 50);
+    const cap = loaded ? 100 : 88;                    // ease toward 88 while loading, finish on real load
+    p += (cap - p) * 0.06 + 0.5; if (p > cap) p = cap;
+    mono.style.setProperty('--f', p.toFixed(1) + '%');
+    mono.style.setProperty('--fg', (p / 100).toFixed(2));
+    line.style.width = p + '%'; pct.textContent = Math.floor(p);
+    if (loaded && p >= 99.4) {
+      clearInterval(id);
+      mono.style.setProperty('--f', '100%'); line.style.width = '100%'; pct.textContent = 100;
+      setTimeout(() => { $('#preload').classList.add('done'); done(); }, 450);
+    }
+  }, 28);
 }
 
 /* ============ 3D ORB (fogged depth, pauses off-screen) ============ */
@@ -62,13 +78,13 @@ function hero3d() {
   catch (e) { canvas.style.display = 'none'; return; }
   renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
   const scene = new THREE.Scene();
-  scene.fog = new THREE.FogExp2(new THREE.Color('#060713'), 0.13);   // depth: far points fade to bg
+  scene.fog = new THREE.FogExp2(new THREE.Color('#080706'), 0.13);   // depth: far points fade to bg
   const cam = new THREE.PerspectiveCamera(60, 1, 0.1, 100); cam.position.z = 5.6;
   const group = new THREE.Group(); scene.add(group);
 
   const N = reduce ? 700 : (isMobile ? 1100 : 2000), R = 2.35;
   const pos = new Float32Array(N * 3), col = new Float32Array(N * 3);
-  const cA = new THREE.Color('#8b5cf6'), cB = new THREE.Color('#ec4899'), cC = new THREE.Color('#22d3ee');
+  const cA = new THREE.Color('#f7e6a6'), cB = new THREE.Color('#d4af37'), cC = new THREE.Color('#8a6a1f');
   for (let i = 0; i < N; i++) {
     const y = 1 - (i / (N - 1)) * 2, r = Math.sqrt(1 - y * y), th = i * 2.399963;
     pos[i * 3] = Math.cos(th) * r * R; pos[i * 3 + 1] = y * R; pos[i * 3 + 2] = Math.sin(th) * r * R;
@@ -80,7 +96,7 @@ function hero3d() {
   geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
   const pts = new THREE.Points(geo, new THREE.PointsMaterial({ size: 0.04, vertexColors: true, transparent: true, opacity: .95, blending: THREE.AdditiveBlending, depthWrite: false, fog: true }));
   group.add(pts);
-  const wire = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.IcosahedronGeometry(1.4, 1)), new THREE.LineBasicMaterial({ color: 0x8b5cf6, transparent: true, opacity: .28, fog: true }));
+  const wire = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.IcosahedronGeometry(1.4, 1)), new THREE.LineBasicMaterial({ color: 0xd4af37, transparent: true, opacity: .3, fog: true }));
   group.add(wire);
 
   const mo = { x: 0, y: 0, tx: 0, ty: 0 };
@@ -150,19 +166,14 @@ $('#dots').innerHTML = cards.map((_, i) => `<i data-i="${i}"></i>`).join('');
 const dots = $$('#dots i');
 function setDot(a) { dots.forEach((d, i) => d.classList.toggle('on', i === a)); }
 let cflRaf = 0;
-function coverflow() {
-  const mid = track.scrollLeft + track.clientWidth / 2; let best = 0, bestD = 1e9;
-  cards.forEach((card, i) => {
-    const c = card.offsetLeft + card.offsetWidth / 2, d = Math.abs(c - mid);
-    const nd = Math.min(1, d / (track.clientWidth * 0.55));
-    card.querySelector('.pcard__in').style.transform = `scale(${(1 - nd * 0.12).toFixed(3)})`;
-    card.style.opacity = (1 - nd * 0.5).toFixed(3);
-    if (d < bestD) { bestD = d; best = i; }
-  });
+const padL = () => parseFloat(getComputedStyle(track).paddingLeft) || 0;
+function updateActive() {
+  const target = track.scrollLeft + padL(); let best = 0, bestD = 1e9;
+  cards.forEach((card, i) => { const d = Math.abs(card.offsetLeft - target); if (d < bestD) { bestD = d; best = i; } });
   setDot(best);
 }
-track.addEventListener('scroll', () => { if (!cflRaf) cflRaf = requestAnimationFrame(() => { coverflow(); cflRaf = 0; }); }, { passive: true });
-function centerOn(i) { const card = cards[i]; if (!card) return; track.scrollTo({ left: card.offsetLeft - (track.clientWidth - card.offsetWidth) / 2, behavior: 'smooth' }); sfx.nav(); }
+track.addEventListener('scroll', () => { if (!cflRaf) cflRaf = requestAnimationFrame(() => { updateActive(); cflRaf = 0; }); }, { passive: true });
+function centerOn(i) { const card = cards[i]; if (!card) return; card.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' }); sfx.nav(); }
 $('#next').onclick = () => { const cur = dots.findIndex((d) => d.classList.contains('on')); centerOn(Math.min(cards.length - 1, cur + 1)); };
 $('#prev').onclick = () => { const cur = dots.findIndex((d) => d.classList.contains('on')); centerOn(Math.max(0, cur - 1)); };
 dots.forEach((d) => (d.onclick = () => centerOn(+d.dataset.i)));
@@ -178,7 +189,7 @@ if (finePointer) cards.forEach((card) => {
   addEventListener('pointermove', (e) => { if (down) track.scrollLeft = sl - (e.clientX - sx); });
   addEventListener('pointerup', () => (down = false));
 });
-requestAnimationFrame(coverflow);
+requestAnimationFrame(updateActive);
 
 /* ============ REVEALS / STATS / CHIPS ============ */
 $$('h2[data-reveal-line]').forEach((h) => (h.innerHTML = `<span class="ln">${h.innerHTML}</span>`));

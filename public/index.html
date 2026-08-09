@@ -7,9 +7,9 @@
 <meta name="description" content="Erfanul Hakim Farhan — AI &amp; Automation Developer. An immersive portfolio of AI web apps, RAG systems, and automation. Interactive 3D, sound, motion.">
 <style>
   :root{
-    --bg:#060713; --bg2:#0a0c1d; --card:#0e1024; --ink:#f4f5ff; --muted:#a4aad0; --faint:#5b6294;
-    --line:#1e1b3c; --v:#8b5cf6; --p:#ec4899; --c:#22d3ee; --b:#3b82f6;
-    --grad:linear-gradient(100deg,var(--v),var(--p) 45%,var(--c));
+    --bg:#080706; --bg2:#0e0c09; --card:#14110b; --ink:#f6efdd; --muted:#a99f86; --faint:#6a6150;
+    --line:#2a2317; --v:#e6c15a; --p:#f7e6a6; --c:#c99a2e; --b:#d4af37; --gold:#d4af37;
+    --grad:linear-gradient(100deg,var(--p),var(--v) 45%,var(--c));
   }
   *{box-sizing:border-box}
   html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
@@ -17,21 +17,31 @@
     font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;overflow-x:hidden}
   a{color:inherit;text-decoration:none}
   .wrap{max-width:1180px;margin:0 auto;padding:0 1.4rem}
-  ::selection{background:var(--p);color:#fff}
+  ::selection{background:var(--p);color:#151007}
   .grad-text{background:linear-gradient(100deg,var(--v),var(--p),var(--c),var(--v));background-size:300% 100%;
     -webkit-background-clip:text;background-clip:text;color:transparent;animation:hue 9s linear infinite}
   @keyframes hue{to{background-position:300% 0}}
 
-  .preload{position:fixed;inset:0;z-index:10000;background:var(--bg);display:grid;place-items:center;transition:opacity .7s ease,visibility .7s}
-  .preload.done{opacity:0;visibility:hidden}
-  .preload .count{font-size:clamp(3.5rem,15vw,9rem);font-weight:850;letter-spacing:-.04em;line-height:1}
-  .preload small{display:block;color:var(--faint);letter-spacing:.3em;text-transform:uppercase;font-size:.7rem;margin-top:.6rem}
-  .prebar{height:2px;width:min(320px,60vw);background:var(--line);border-radius:9px;margin:1.2rem auto 0;overflow:hidden}
-  .prebar>span{display:block;height:100%;width:0;background:var(--grad)}
+  .preload{position:fixed;inset:0;z-index:10000;background:var(--bg);display:grid;place-items:center;
+    transition:opacity .8s ease,visibility .8s,clip-path .9s cubic-bezier(.7,0,.2,1)}
+  .preload.done{opacity:0;visibility:hidden;clip-path:inset(0 0 100% 0)}
+  .pl-mono{font-size:clamp(4.5rem,20vw,12rem);font-weight:850;letter-spacing:.05em;line-height:1;
+    background:linear-gradient(to top,var(--gold) var(--f,0%),#26200f var(--f,0%));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 0 30px rgba(212,175,55,calc(var(--fg,0)*.35)))}
+  .pl-meta{position:absolute;left:0;right:0;bottom:2.6rem;display:flex;justify-content:space-between;align-items:center;
+    padding:0 clamp(1.2rem,5vw,3.2rem);font:600 .72rem/1 -apple-system,sans-serif;letter-spacing:.25em;text-transform:uppercase;color:var(--faint)}
+  .pl-meta #plpct{color:var(--gold);font-variant-numeric:tabular-nums}
+  .pl-line{position:absolute;left:0;right:0;bottom:0;height:2px;background:rgba(212,175,55,.1)}
+  .pl-line>span{display:block;height:100%;width:0;background:linear-gradient(90deg,transparent,var(--gold));box-shadow:0 0 20px var(--gold)}
 
   nav{position:fixed;top:0;left:0;right:0;z-index:60;backdrop-filter:blur(14px);background:rgba(6,7,19,.55);border-bottom:1px solid var(--line)}
   nav .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}
-  .brand{font-weight:800;letter-spacing:-.02em;font-size:1rem}
+  .brand{display:inline-flex;align-items:center;gap:.6rem}
+  .mono{font:850 .92rem/1 -apple-system,sans-serif;letter-spacing:.14em;color:#151007;background:var(--grad);
+    background-size:200% 200%;animation:shift 6s ease infinite;padding:.42rem .55rem;border-radius:8px;box-shadow:0 4px 18px rgba(212,175,55,.3)}
+  .mtag{color:var(--faint);font-size:.7rem;letter-spacing:.24em;text-transform:uppercase}
+  @media(max-width:520px){.mtag{display:none}}
   .navr{display:flex;align-items:center;gap:1.2rem}
   .navr a{color:var(--muted);font-size:.92rem;transition:.2s}
   .navr a:hover{color:var(--ink)}
@@ -41,11 +51,11 @@
 
   header{position:relative;min-height:100svh;display:flex;align-items:center;overflow:hidden}
   #gl{position:absolute;inset:0;z-index:1}
-  .mesh{position:absolute;inset:-30%;z-index:0;filter:blur(90px);opacity:.6;
-    background:radial-gradient(40% 40% at 25% 30%,rgba(139,92,246,.5),transparent 60%),
-      radial-gradient(40% 40% at 75% 40%,rgba(236,72,153,.42),transparent 60%),
-      radial-gradient(45% 45% at 55% 75%,rgba(34,211,238,.4),transparent 60%);
-    animation:mesh 24s ease-in-out infinite}
+  .mesh{position:absolute;inset:-30%;z-index:0;filter:blur(85px);opacity:.5;
+    background:radial-gradient(40% 40% at 25% 30%,rgba(230,193,90,.34),transparent 60%),
+      radial-gradient(40% 40% at 75% 40%,rgba(212,175,55,.26),transparent 60%),
+      radial-gradient(45% 45% at 55% 75%,rgba(201,154,46,.22),transparent 60%);
+    animation:mesh 26s ease-in-out infinite}
   @keyframes mesh{0%,100%{transform:rotate(0) scale(1)}50%{transform:rotate(20deg) scale(1.15)}}
   .hero{position:relative;z-index:3;pointer-events:none;width:100%}
   .hero .in{pointer-events:auto;max-width:min(100%,780px)}
@@ -57,8 +67,8 @@
   .lead{color:var(--muted);max-width:44ch;margin:1.1rem 0 1.8rem;opacity:0;transform:translateY(12px);font-size:clamp(.95rem,2.5vw,1.1rem)}
   .cta{display:flex;gap:.8rem;flex-wrap:wrap;opacity:0;transform:translateY(12px)}
   .btn{padding:.85rem 1.4rem;border-radius:999px;font-weight:700;cursor:pointer;border:0;transition:.2s;font-size:1rem;position:relative}
-  .btn.primary{background:var(--grad);background-size:200% 200%;color:#fff;animation:shift 6s ease infinite;box-shadow:0 8px 30px rgba(139,92,246,.35)}
-  .btn.primary:hover{box-shadow:0 16px 50px rgba(236,72,153,.45)}
+  .btn.primary{background:var(--grad);background-size:200% 200%;color:#151007;animation:shift 6s ease infinite;box-shadow:0 8px 30px rgba(212,175,55,.32)}
+  .btn.primary:hover{box-shadow:0 16px 50px rgba(212,175,55,.5)}
   @keyframes shift{50%{background-position:100% 50%}}
   .btn.ghost{background:rgba(255,255,255,.03);color:var(--ink);border:1px solid var(--line)}
   .scrollcue{position:absolute;bottom:1.2rem;left:50%;transform:translateX(-50%);z-index:3;color:var(--faint);font-size:.7rem;letter-spacing:.25em;text-transform:uppercase;animation:bob 2s ease-in-out infinite}
@@ -82,10 +92,12 @@
 
   .work h2 span{color:var(--faint);font-weight:400;font-size:.42em;letter-spacing:0}
   .carousel{position:relative;margin-top:1.5rem}
-  .track{display:flex;gap:1.2rem;overflow-x:auto;padding:2rem calc(50vw - 215px) 2rem;scroll-snap-type:x mandatory;
+  .track{display:flex;gap:1.2rem;overflow-x:auto;
+    padding:2rem 1.4rem 2rem max(1.4rem,calc((100vw - 1180px)/2 + 1.4rem));
+    scroll-snap-type:x mandatory;scroll-padding-left:max(1.4rem,calc((100vw - 1180px)/2 + 1.4rem));
     scrollbar-width:none;perspective:1600px;-webkit-overflow-scrolling:touch}
   .track::-webkit-scrollbar{display:none}
-  .pcard{scroll-snap-align:center;flex:0 0 clamp(280px,80vw,430px);position:relative;transition:opacity .3s;will-change:opacity}
+  .pcard{scroll-snap-align:start;flex:0 0 clamp(280px,80vw,420px);position:relative}
   .pcard__in{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:1.7rem;position:relative;overflow:hidden;
     min-height:340px;display:flex;flex-direction:column;transition:transform .3s cubic-bezier(.2,.7,.2,1),box-shadow .3s,border-color .3s;transform-style:preserve-3d}
   .pcard__in::before{content:"";position:absolute;inset:0;opacity:0;transition:.3s;pointer-events:none;background:radial-gradient(520px circle at var(--mx,50%) var(--my,30%),rgba(236,72,153,.22),transparent 45%)}
@@ -122,14 +134,14 @@
   .contact p{color:var(--muted);max-width:46ch;margin:.4rem auto 1.6rem}
   footer{border-top:1px solid var(--line);padding:2rem 0;text-align:center;color:var(--faint);font-size:.82rem}
 
-  #chatBtn{position:fixed;right:1rem;bottom:1rem;z-index:70;border:0;cursor:pointer;border-radius:999px;padding:.85rem 1.1rem;font-weight:700;font-size:.92rem;color:#fff;background:var(--grad);background-size:200% 200%;animation:shift 6s ease infinite;box-shadow:0 12px 34px rgba(139,92,246,.45)}
+  #chatBtn{position:fixed;right:1rem;bottom:1rem;z-index:70;border:0;cursor:pointer;border-radius:999px;padding:.85rem 1.1rem;font-weight:700;font-size:.92rem;color:#151007;background:var(--grad);background-size:200% 200%;animation:shift 6s ease infinite;box-shadow:0 12px 34px rgba(212,175,55,.45)}
   #chatPanel{position:fixed;right:1rem;bottom:4.6rem;z-index:70;width:min(370px,92vw);height:min(520px,70vh);background:var(--bg2);border:1px solid var(--line);border-radius:18px;display:none;flex-direction:column;box-shadow:0 24px 70px rgba(0,0,0,.6);overflow:hidden}
   #chatPanel.open{display:flex}
   .chead{padding:.9rem 1rem;border-bottom:1px solid var(--line);font-weight:700;display:flex;justify-content:space-between;align-items:center}
   .chead small{color:var(--muted);font-weight:400;display:block;font-size:.78rem}
   #msgs{flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:.6rem}
   .m{max-width:85%;padding:.6rem .85rem;border-radius:12px;font-size:.92rem;line-height:1.5}
-  .m.u{align-self:flex-end;background:var(--v);color:#fff;border-bottom-right-radius:4px}
+  .m.u{align-self:flex-end;background:var(--v);color:#151007;border-bottom-right-radius:4px}
   .m.a{align-self:flex-start;background:var(--card);border:1px solid var(--line);border-bottom-left-radius:4px}
   .cinput{display:flex;gap:.5rem;padding:.7rem;border-top:1px solid var(--line)}
   .cinput input{flex:1;background:var(--card);border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:.6rem .8rem;outline:none;font:inherit}
@@ -156,19 +168,20 @@
 </style>
 </head>
 <body>
-<div class="preload" id="preload"><div class="pc" style="text-align:center">
-  <div class="count grad-text" id="pcount">0</div><small>Erfanul Hakim Farhan</small>
-  <div class="prebar"><span id="prebar"></span></div>
-</div></div>
+<div class="preload" id="preload">
+  <div class="pl-mono" id="plMono">EHF</div>
+  <div class="pl-meta"><span class="pl-label">Erfanul Hakim Farhan</span><span><span id="plpct">0</span>%</span></div>
+  <div class="pl-line"><span id="plline"></span></div>
+</div>
 
 <nav><div class="wrap">
-  <div class="brand grad-text">Erfanul Hakim Farhan</div>
+  <a class="brand" href="#top" aria-label="Home"><span class="mono">EHF</span><span class="mtag">Portfolio</span></a>
   <div class="navr">
     <a class="nl" href="#work">Work</a><a class="nl" href="#about">About</a><a class="nl" href="#contact">Contact</a>
   </div>
 </div></nav>
 
-<header>
+<header id="top">
   <div class="mesh"></div>
   <canvas id="gl"></canvas>
   <div class="hero wrap"><div class="in">
