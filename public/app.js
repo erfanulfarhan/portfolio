@@ -235,4 +235,24 @@ async function send() {
 }
 $('#csend').onclick = send; $('#cin').addEventListener('keydown', (e) => { if (e.key === 'Enter') send(); });
 
+/* ============ CONTACT FORM ============ */
+const cform = $('#cform');
+if (cform) cform.addEventListener('submit', async (e) => {
+  e.preventDefault(); sfx.click();
+  const btn = $('#cformBtn'), status = $('#cformStatus');
+  const fd = new FormData(cform);
+  const data = { name: (fd.get('name') || '').trim(), email: (fd.get('email') || '').trim(), message: (fd.get('message') || '').trim(), company: fd.get('company') || '' };
+  status.className = 'cform-status';
+  if (!data.name || !data.email || !data.message) { status.textContent = 'Please fill in all fields.'; status.classList.add('err'); return; }
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(data.email)) { status.textContent = 'Please enter a valid email.'; status.classList.add('err'); return; }
+  const label = btn.textContent; btn.disabled = true; btn.textContent = 'Sending…'; status.textContent = '';
+  try {
+    const r = await fetch('/api/contact', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(data) });
+    const d = await r.json().catch(() => ({}));
+    if (r.ok) { status.textContent = "Thanks — your message is on its way. I'll get back to you soon."; status.classList.add('ok'); cform.reset(); }
+    else { status.textContent = '⚠️ ' + (d.error || 'Could not send — please email me directly.'); status.classList.add('err'); }
+  } catch { status.textContent = '⚠️ Network error — please email me directly.'; status.classList.add('err'); }
+  btn.disabled = false; btn.textContent = label;
+});
+
 preloader(heroText);
