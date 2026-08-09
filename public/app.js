@@ -196,7 +196,7 @@ $('#prev').onclick = () => goStop(currentStop() - 1);
 addEventListener('resize', () => { clearTimeout(rzT); rzT = setTimeout(computeStops, 200); });
 computeStops();
 addEventListener('load', () => setTimeout(computeStops, 300));
-// desktop: soft pointer glow on hover (kept flat — no 3D tilt, so orientation can't get stuck)
+// desktop: soft pointer glow on hover (kept flat, no 3D tilt, so orientation can't get stuck)
 if (finePointer) cards.forEach((card) => {
   const inn = card.querySelector('.pcard__in');
   card.addEventListener('mouseenter', () => sfx.hover());
