@@ -112,6 +112,7 @@
     user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
   .track.grabbing{cursor:grabbing}
   .track.grabbing .pcard{pointer-events:none}
+  .track.grabbing .pcard__in{transform:scale(.965);transition:transform .18s ease}  /* pickup "pinch" while dragging */
   .track::-webkit-scrollbar{display:none}
   .pcard{scroll-snap-align:start;flex:0 0 clamp(280px,80vw,420px);position:relative}
   .pcard__in{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:1.7rem;position:relative;overflow:hidden;

@@ -221,16 +221,27 @@ if (finePointer) cards.forEach((card) => {
 });
 // mouse drag to slide the whole works track (touch keeps native scroll).
 // 'grabbing' is only added once an actual drag starts, so plain clicks still hit
-// the card links (Live / Code) normally.
-let down = false, dragged = false, sx = 0, sl = 0;
-track.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse') return; down = true; dragged = false; sx = e.clientX; sl = track.scrollLeft; });
+// the card links (Live / Code) normally. Adds a pickup "pinch" + release momentum
+// so the drag feels physical.
+let down = false, dragged = false, sx = 0, sl = 0, vel = 0, fling = 0;
+track.addEventListener('pointerdown', (e) => {
+  if (e.pointerType !== 'mouse') return;
+  down = true; dragged = false; sx = e.clientX; sl = track.scrollLeft; vel = 0;
+  cancelAnimationFrame(fling);
+});
 addEventListener('pointermove', (e) => {
   if (!down) return;
   const dx = e.clientX - sx;
-  if (!dragged && Math.abs(dx) > 6) { dragged = true; track.classList.add('grabbing'); }
-  if (dragged) track.scrollLeft = sl - dx;
+  if (!dragged && Math.abs(dx) > 5) { dragged = true; track.classList.add('grabbing'); }
+  if (dragged) { const target = sl - dx; vel = target - track.scrollLeft; track.scrollLeft = target; }  // vel = px moved this frame
 });
-const endDrag = () => { if (down) { down = false; track.classList.remove('grabbing'); } };
+const endDrag = () => {
+  if (!down) return;
+  down = false; track.classList.remove('grabbing');
+  if (dragged && Math.abs(vel) > 0.5) {                       // flick → keep gliding with decay
+    (function glide() { track.scrollLeft += vel; vel *= 0.93; if (Math.abs(vel) > 0.4) fling = requestAnimationFrame(glide); })();
+  }
+};
 addEventListener('pointerup', endDrag); addEventListener('pointercancel', endDrag);
 track.addEventListener('dragstart', (e) => e.preventDefault());  // no native image/text drag
 track.addEventListener('click', (e) => { if (dragged) { e.preventDefault(); e.stopPropagation(); dragged = false; } }, true);  // swallow the click only right after a drag
