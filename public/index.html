@@ -4,109 +4,115 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Erfanul Hakim Farhan — AI &amp; Automation Developer</title>
-<meta name="description" content="Erfanul Hakim Farhan — AI &amp; Automation Developer. I build AI-powered web apps and automation that watches, alerts, and acts.">
+<meta name="description" content="Erfanul Hakim Farhan — AI &amp; Automation Developer. Interactive 3D, immersive portfolio of AI web apps, RAG systems, and automation.">
 <style>
   :root{
-    --bg:#08080d; --bg2:#0e0e17; --card:#12121c; --ink:#eef0f6; --muted:#9aa0b4;
-    --line:#20212e; --a1:#6366f1; --a2:#a855f7; --a3:#22d3ee;
-    --grad:linear-gradient(100deg,var(--a1),var(--a2) 55%,var(--a3));
+    --bg:#05060a; --bg2:#0a0c13; --card:#0f121c; --ink:#f3f5fb; --muted:#9aa2ba; --faint:#5f6784;
+    --line:#1b1f2e; --a1:#6366f1; --a2:#22d3ee; --a3:#a855f7;
+    --grad:linear-gradient(100deg,var(--a1),var(--a3) 55%,var(--a2));
   }
   *{box-sizing:border-box}
   html{scroll-behavior:smooth}
   body{margin:0;background:var(--bg);color:var(--ink);
-    font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;
-    overflow-x:hidden}
+    font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;overflow-x:hidden}
   a{color:inherit;text-decoration:none}
-  .wrap{max-width:1040px;margin:0 auto;padding:0 1.2rem}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 1.4rem}
   .grad-text{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  ::selection{background:var(--a3);color:#fff}
 
   /* nav */
-  nav{position:sticky;top:0;z-index:40;backdrop-filter:blur(12px);
-    background:rgba(8,8,13,.6);border-bottom:1px solid var(--line)}
-  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}
-  .brand{font-weight:800;letter-spacing:-.02em;font-size:1.15rem}
-  .navlinks a{color:var(--muted);margin-left:1.4rem;font-size:.95rem;transition:.2s}
-  .navlinks a:hover{color:var(--ink)}
-  @media(max-width:600px){.navlinks a{margin-left:.9rem;font-size:.85rem}}
+  nav{position:fixed;top:0;left:0;right:0;z-index:60;backdrop-filter:blur(12px);
+    background:rgba(5,6,10,.5);border-bottom:1px solid var(--line)}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:62px}
+  .brand{font-weight:800;letter-spacing:-.02em}
+  .navr{display:flex;align-items:center;gap:1.3rem}
+  .navr a{color:var(--muted);font-size:.92rem;transition:.2s}
+  .navr a:hover{color:var(--ink)}
+  .sound{display:inline-flex;align-items:center;gap:.4rem;background:transparent;border:1px solid var(--line);
+    color:var(--muted);border-radius:999px;padding:.35rem .7rem;font:600 .78rem/1 inherit;cursor:pointer;transition:.2s}
+  .sound:hover{border-color:var(--a2);color:var(--ink)}
+  .sound.on{border-color:var(--a2);color:var(--a2)}
+  @media(max-width:640px){.navr a.nl{display:none}}
 
-  /* hero */
-  header{position:relative;min-height:92vh;display:flex;align-items:center;overflow:hidden}
-  .aurora{position:absolute;inset:-20% -10%;z-index:0;filter:blur(70px);opacity:.55}
-  .blob{position:absolute;border-radius:50%;mix-blend-mode:screen;animation:float 18s ease-in-out infinite}
-  .b1{width:46vw;height:46vw;background:#4f46e5;top:-8%;left:-6%}
-  .b2{width:40vw;height:40vw;background:#9333ea;bottom:-10%;right:-4%;animation-delay:-6s}
-  .b3{width:32vw;height:32vw;background:#0891b2;top:30%;left:40%;animation-delay:-11s}
-  @keyframes float{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(6%,8%) scale(1.08)}66%{transform:translate(-5%,-6%) scale(.95)}}
-  .grid-bg{position:absolute;inset:0;z-index:0;opacity:.35;
-    background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
-    background-size:44px 44px;mask-image:radial-gradient(ellipse at 50% 40%,#000 30%,transparent 75%)}
-  .hero{position:relative;z-index:2}
-  .hello{color:var(--a3);font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:.82rem}
-  h1{font-size:clamp(2.6rem,7vw,4.6rem);line-height:1.02;margin:.4rem 0 .2rem;font-weight:850;letter-spacing:-.03em}
-  .role{font-size:clamp(1.2rem,3.5vw,1.9rem);font-weight:750;min-height:1.5em}
-  .cursor{display:inline-block;width:.6ch;background:var(--a2);animation:blink 1s steps(1) infinite;color:transparent}
-  @keyframes blink{50%{opacity:0}}
-  .lead{color:var(--muted);max-width:42ch;margin:1rem 0 1.8rem;font-size:1.08rem}
-  .cta{display:flex;gap:.8rem;flex-wrap:wrap}
-  .btn{padding:.8rem 1.3rem;border-radius:12px;font-weight:650;cursor:pointer;border:0;transition:.2s;font-size:1rem}
+  /* hero with 3D canvas */
+  header{position:relative;min-height:100svh;display:flex;align-items:center;overflow:hidden}
+  #gl{position:absolute;inset:0;z-index:0}
+  .hero{position:relative;z-index:2;pointer-events:none}
+  .hero .in{pointer-events:auto}
+  .hello{color:var(--a2);font-weight:600;letter-spacing:.1em;text-transform:uppercase;font-size:.8rem;
+    opacity:0;transform:translateY(12px)}
+  h1{font-size:clamp(2.6rem,9vw,6rem);line-height:.98;margin:.5rem 0 .3rem;font-weight:850;letter-spacing:-.035em}
+  h1 .l{display:inline-block;opacity:0;transform:translateY(40px) rotate(6deg)}
+  .role{font-size:clamp(1.1rem,3vw,1.7rem);font-weight:700;color:var(--muted);min-height:1.5em;
+    opacity:0;transform:translateY(12px)}
+  .lead{color:var(--muted);max-width:46ch;margin:1.1rem 0 1.8rem;opacity:0;transform:translateY(12px)}
+  .cta{display:flex;gap:.8rem;flex-wrap:wrap;opacity:0;transform:translateY(12px)}
+  .btn{padding:.85rem 1.4rem;border-radius:999px;font-weight:700;cursor:pointer;border:0;transition:.2s;font-size:1rem}
   .btn.primary{background:var(--grad);color:#fff;background-size:200% 200%;animation:shift 6s ease infinite}
-  .btn.primary:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(124,92,255,.35)}
+  .btn.primary:hover{transform:translateY(-2px);box-shadow:0 14px 40px rgba(124,92,255,.4)}
   @keyframes shift{50%{background-position:100% 50%}}
-  .btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
-  .btn.ghost:hover{border-color:var(--a2);color:#fff}
+  .btn.ghost{background:rgba(255,255,255,.03);color:var(--ink);border:1px solid var(--line)}
+  .btn.ghost:hover{border-color:var(--a2)}
+  .scrollcue{position:absolute;bottom:1.4rem;left:50%;transform:translateX(-50%);z-index:2;color:var(--faint);
+    font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;animation:bob 2s ease-in-out infinite}
+  @keyframes bob{50%{transform:translate(-50%,6px)}}
 
-  section{padding:5rem 0;position:relative}
-  .eyebrow{color:var(--a3);font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:.8rem}
-  h2{font-size:clamp(1.7rem,4vw,2.4rem);margin:.3rem 0 1.6rem;font-weight:800;letter-spacing:-.02em}
+  section{position:relative;padding:6rem 0;z-index:1}
+  .eyebrow{color:var(--a2);font-weight:600;letter-spacing:.1em;text-transform:uppercase;font-size:.78rem}
+  h2{font-size:clamp(1.9rem,5vw,3rem);margin:.4rem 0 .4rem;font-weight:850;letter-spacing:-.02em}
+  .reveal{opacity:0;transform:translateY(30px)}
+  .reveal.in{opacity:1;transform:none;transition:.8s cubic-bezier(.2,.7,.2,1)}
 
-  /* reveal */
-  .reveal{opacity:0;transform:translateY(26px);transition:.7s cubic-bezier(.2,.7,.2,1)}
-  .reveal.in{opacity:1;transform:none}
-
-  /* about + stats */
-  .about{color:var(--muted);max-width:60ch;font-size:1.08rem}
-  .stats{display:flex;gap:2.2rem;margin-top:1.6rem;flex-wrap:wrap}
-  .stat b{display:block;font-size:1.9rem;font-weight:800}
-  .stat span{color:var(--muted);font-size:.9rem}
-
-  /* projects */
-  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.2rem}
-  .pcard{position:relative;background:var(--card);border:1px solid var(--line);border-radius:18px;
-    padding:1.4rem;transition:transform .25s,box-shadow .25s,border-color .25s;transform-style:preserve-3d;overflow:hidden}
-  .pcard::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(400px circle at var(--mx,50%) var(--my,0%),rgba(124,92,255,.16),transparent 45%);opacity:0;transition:.25s}
-  .pcard:hover{border-color:#33344a;box-shadow:0 20px 50px rgba(0,0,0,.5)}
+  /* carousel */
+  .work h2 span{color:var(--faint);font-weight:400;font-size:.5em;letter-spacing:0}
+  .carousel{position:relative;margin-top:2rem}
+  .track{display:flex;gap:1.2rem;overflow-x:auto;padding:1.5rem .2rem 2rem;scroll-snap-type:x mandatory;
+    scrollbar-width:none;perspective:1400px}
+  .track::-webkit-scrollbar{display:none}
+  .pcard{scroll-snap-align:center;flex:0 0 clamp(280px,72vw,420px);background:var(--card);border:1px solid var(--line);
+    border-radius:20px;padding:1.6rem;transition:transform .25s cubic-bezier(.2,.7,.2,1),box-shadow .25s,border-color .25s;
+    transform-style:preserve-3d;position:relative;overflow:hidden;min-height:340px;display:flex;flex-direction:column}
+  .pcard::before{content:"";position:absolute;inset:0;opacity:0;transition:.3s;pointer-events:none;
+    background:radial-gradient(500px circle at var(--mx,50%) var(--my,30%),rgba(124,92,255,.18),transparent 45%)}
   .pcard:hover::before{opacity:1}
-  .pcard h3{margin:.2rem 0 .5rem;font-size:1.2rem}
-  .pcard p{color:var(--muted);font-size:.95rem;margin:.2rem 0 .9rem}
-  .tags{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.9rem}
-  .tag{font-size:.72rem;color:var(--a3);border:1px solid var(--line);border-radius:999px;padding:.15rem .55rem}
-  .plinks a{font-size:.9rem;font-weight:650;margin-right:1rem;color:#c7c9d6}
-  .plinks a:hover{color:#fff}
-  .live{display:inline-flex;align-items:center;gap:.4rem;color:#34d399}
-  .dot{width:8px;height:8px;border-radius:50%;background:#34d399;box-shadow:0 0 0 0 rgba(52,211,153,.6);animation:pulse 1.8s infinite}
+  .pcard:hover{border-color:#34364d;box-shadow:0 30px 70px rgba(0,0,0,.55)}
+  .pcard .num{position:absolute;top:1rem;right:1.3rem;font-size:3.2rem;font-weight:850;color:#151827;letter-spacing:-.04em}
+  .pcard .live{display:inline-flex;align-items:center;gap:.4rem;color:#34d399;font-size:.78rem;font-weight:600;margin-bottom:.6rem}
+  .pcard .dot{width:8px;height:8px;border-radius:50%;background:#34d399;box-shadow:0 0 0 0 rgba(52,211,153,.6);animation:pulse 1.8s infinite}
   @keyframes pulse{70%{box-shadow:0 0 0 8px rgba(52,211,153,0)}100%{box-shadow:0 0 0 0 rgba(52,211,153,0)}}
+  .pcard h3{font-size:1.4rem;margin:.1rem 0 .5rem;position:relative;z-index:1}
+  .pcard p{color:var(--muted);font-size:.95rem;margin:0 0 1rem;flex:1;position:relative;z-index:1}
+  .tags{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1rem;position:relative;z-index:1}
+  .tag{font-size:.72rem;color:var(--a2);border:1px solid var(--line);border-radius:999px;padding:.2rem .6rem}
+  .plinks{display:flex;gap:1rem;position:relative;z-index:1}
+  .plinks a{font-size:.9rem;font-weight:650;color:#c7cbe0}
+  .plinks a:hover{color:var(--a2)}
+  .carbtns{display:flex;gap:.6rem;justify-content:center;margin-top:.5rem}
+  .carbtns button{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--card);
+    color:var(--ink);font-size:1.1rem;cursor:pointer;transition:.2s}
+  .carbtns button:hover{border-color:var(--a2);color:var(--a2);transform:translateY(-2px)}
+  .hint{color:var(--faint);font-size:.8rem;text-align:center;margin-top:.4rem}
 
-  /* skills */
-  .chips{display:flex;flex-wrap:wrap;gap:.6rem}
-  .chip{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:.5rem .9rem;font-size:.9rem;
-    transition:.2s}
-  .chip:hover{border-color:var(--a2);transform:translateY(-2px)}
+  /* about / skills */
+  .about p{color:var(--muted);max-width:60ch;font-size:1.1rem}
+  .stats{display:flex;gap:2.5rem;margin-top:2rem;flex-wrap:wrap}
+  .stat b{display:block;font-size:2.4rem;font-weight:850}.stat span{color:var(--faint);font-size:.85rem}
+  .chips{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1.4rem}
+  .chip{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:.5rem .9rem;font-size:.9rem;transition:.2s}
+  .chip:hover{border-color:var(--a3);transform:translateY(-3px)}
 
-  /* contact */
   .contact{text-align:center}
-  .contact h2{margin-bottom:.6rem}
-  .contact p{color:var(--muted);max-width:46ch;margin:0 auto 1.6rem}
-  footer{border-top:1px solid var(--line);padding:2rem 0;text-align:center;color:var(--muted);font-size:.88rem}
+  .contact p{color:var(--muted);max-width:46ch;margin:.4rem auto 1.6rem}
+  footer{border-top:1px solid var(--line);padding:2rem 0;text-align:center;color:var(--faint);font-size:.85rem}
 
-  /* AI chat */
-  #chatBtn{position:fixed;right:1.2rem;bottom:1.2rem;z-index:60;border:0;cursor:pointer;border-radius:999px;
+  /* chat */
+  #chatBtn{position:fixed;right:1.2rem;bottom:1.2rem;z-index:70;border:0;cursor:pointer;border-radius:999px;
     padding:.9rem 1.2rem;font-weight:700;color:#fff;background:var(--grad);background-size:200% 200%;
     animation:shift 6s ease infinite;box-shadow:0 12px 30px rgba(124,92,255,.4)}
-  #chatPanel{position:fixed;right:1.2rem;bottom:5rem;z-index:60;width:min(370px,92vw);height:min(520px,72vh);
+  #chatPanel{position:fixed;right:1.2rem;bottom:5rem;z-index:70;width:min(370px,92vw);height:min(520px,72vh);
     background:var(--bg2);border:1px solid var(--line);border-radius:18px;display:none;flex-direction:column;
     box-shadow:0 24px 70px rgba(0,0,0,.6);overflow:hidden}
-  #chatPanel.open{display:flex;animation:pop .25s ease}
-  @keyframes pop{from{opacity:0;transform:translateY(12px) scale(.98)}}
+  #chatPanel.open{display:flex}
   .chead{padding:.9rem 1rem;border-bottom:1px solid var(--line);font-weight:700;display:flex;justify-content:space-between;align-items:center}
   .chead small{color:var(--muted);font-weight:400;display:block;font-size:.78rem}
   #msgs{flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:.6rem}
@@ -115,78 +121,82 @@
   .m.a{align-self:flex-start;background:var(--card);border:1px solid var(--line);border-bottom-left-radius:4px}
   .cinput{display:flex;gap:.5rem;padding:.7rem;border-top:1px solid var(--line)}
   .cinput input{flex:1;background:var(--card);border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:.6rem .8rem;outline:none;font:inherit}
-  .cinput input:focus{border-color:var(--a2)}
-  .cinput button{background:var(--grad);color:#fff;border:0;border-radius:10px;padding:0 .9rem;font-weight:700;cursor:pointer}
-  .sugg{display:flex;flex-wrap:wrap;gap:.4rem;padding:0 1rem .6rem}
-  .sugg button{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:.3rem .6rem;font-size:.78rem;cursor:pointer}
-  .sugg button:hover{border-color:var(--a2);color:var(--ink)}
+  #sugg{display:flex;flex-wrap:wrap;gap:.4rem;padding:0 .7rem .5rem}
+  #sugg button{background:var(--card);border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:.3rem .6rem;font-size:.78rem;cursor:pointer}
+  @media(prefers-reduced-motion:reduce){*{animation-duration:.001s!important;transition-duration:.001s!important}}
 </style>
 </head>
 <body>
 <nav><div class="wrap">
   <div class="brand grad-text">Erfanul Hakim Farhan</div>
-  <div class="navlinks"><a href="#work">Work</a><a href="#about">About</a><a href="#contact">Contact</a></div>
+  <div class="navr">
+    <a class="nl" href="#work">Work</a>
+    <a class="nl" href="#about">About</a>
+    <a class="nl" href="#contact">Contact</a>
+    <button class="sound" id="soundBtn" aria-pressed="false">🔇 <span>Sound</span></button>
+  </div>
 </div></nav>
 
 <header>
-  <div class="aurora"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
-  <div class="grid-bg"></div>
-  <div class="wrap hero">
-    <div class="hello">Hi, I'm</div>
-    <h1>Erfanul Hakim <span class="grad-text">Farhan</span></h1>
-    <div class="role"><span id="typed"></span><span class="cursor">.</span></div>
-    <p class="lead">I build AI-powered web apps and automation that watches, alerts, and acts — practical tools that ship and stay reliable.</p>
-    <div class="cta">
-      <a class="btn primary" href="#work">View my work</a>
-      <a class="btn ghost" href="#contact">Let's talk →</a>
+  <canvas id="gl"></canvas>
+  <div class="hero wrap"><div class="in">
+    <div class="hello" id="hello">AI &amp; Automation Developer</div>
+    <h1 id="title"></h1>
+    <div class="role" id="role"></div>
+    <p class="lead" id="lead">I build AI-powered web apps, RAG systems, and automation that watches, alerts, and acts — shipped live, end to end.</p>
+    <div class="cta" id="cta">
+      <button class="btn primary" data-scroll="#work">View my work</button>
+      <a class="btn ghost" href="mailto:erfanul100@gmail.com">Hire me</a>
     </div>
-  </div>
+  </div></div>
+  <div class="scrollcue">scroll ↓</div>
 </header>
 
-<section id="about"><div class="wrap reveal">
-  <div class="eyebrow">About</div>
-  <h2>Turning ideas into things that run.</h2>
-  <p class="about">I'm an AI &amp; automation developer. I like building products that do real work — an AI study app that quizzes you from your own notes, bots that book tickets the instant they drop, watchers that alert you the moment something changes. If it's repetitive or could be smarter, I can automate it.</p>
-  <div class="stats">
-    <div class="stat reveal"><b class="grad-text" data-count="5">0</b><span>projects shipped</span></div>
-    <div class="stat reveal"><b class="grad-text" data-count="3">0</b><span>AI models integrated</span></div>
-    <div class="stat reveal"><b class="grad-text">∞</b><span>coffee → code</span></div>
+<section class="work" id="work">
+  <div class="wrap">
+    <span class="eyebrow reveal">Selected work</span>
+    <h2 class="reveal">Things I've shipped <span>— drag or use the arrows</span></h2>
   </div>
-</div></section>
-
-<section id="work"><div class="wrap">
-  <div class="eyebrow reveal">Selected work</div>
-  <h2 class="reveal">Things I've built</h2>
-  <div class="cards" id="cards"></div>
-</div></section>
-
-<section id="skills"><div class="wrap reveal">
-  <div class="eyebrow">Toolkit</div>
-  <h2>What I work with</h2>
-  <div class="chips" id="chips"></div>
-</div></section>
-
-<section id="contact"><div class="wrap contact reveal">
-  <div class="eyebrow">Contact</div>
-  <h2>Have something to build?</h2>
-  <p>I'm available for freelance work — AI apps, automation, bots, and web. Let's make it.</p>
-  <div class="cta" style="justify-content:center">
-    <a class="btn primary" id="emailBtn" href="mailto:erfanul100@gmail.com">Email me</a>
-    <a class="btn ghost" href="https://github.com/erfanulfarhan" target="_blank" rel="noopener">GitHub</a>
+  <div class="carousel">
+    <div class="track" id="track"></div>
+    <div class="carbtns"><button id="prev" aria-label="Previous">←</button><button id="next" aria-label="Next">→</button></div>
+    <p class="hint">Tip: turn on Sound (top-right) for the full ride.</p>
   </div>
-  <p style="margin-top:1rem"><a href="mailto:erfanul100@gmail.com" class="grad-text" style="font-weight:600">erfanul100@gmail.com</a></p>
-</div></section>
+</section>
 
-<footer>© <span id="yr"></span> Erfanul Hakim Farhan · Built with vanilla JS &amp; an AI-powered assistant · <a class="grad-text" href="https://github.com/erfanulfarhan" target="_blank" rel="noopener">github.com/erfanulfarhan</a></footer>
+<section class="about" id="about">
+  <div class="wrap">
+    <span class="eyebrow reveal">About</span>
+    <h2 class="reveal">I turn ideas into live products — fast.</h2>
+    <p class="reveal">From RAG knowledge bases and embeddable AI widgets to automation bots and full-stack apps with auth, real-time data, and analytics — I design it, build it, and deploy it. Available for freelance work.</p>
+    <div class="stats reveal">
+      <div class="stat"><b data-count="6">0</b><span>Live products</span></div>
+      <div class="stat"><b data-count="100">0</b><span>% shipped &amp; deployed</span></div>
+      <div class="stat"><b data-count="24">0</b><span>Hr turnaround mindset</span></div>
+    </div>
+    <div class="chips reveal" id="chips"></div>
+  </div>
+</section>
 
-<button id="chatBtn">💬 Ask about my work</button>
+<section class="contact" id="contact">
+  <div class="wrap">
+    <span class="eyebrow reveal">Contact</span>
+    <h2 class="reveal">Let's build something.</h2>
+    <p class="reveal">Have a project in mind — an AI feature, an automation, a full app? Let's talk.</p>
+    <div class="reveal"><a class="btn primary" href="mailto:erfanul100@gmail.com">erfanul100@gmail.com</a></div>
+  </div>
+</section>
+
+<footer>© <span id="yr"></span> Erfanul Hakim Farhan · Built with vanilla JS, Three.js &amp; an AI assistant · <a class="grad-text" href="https://github.com/erfanulfarhan" target="_blank" rel="noopener">github.com/erfanulfarhan</a></footer>
+
+<button id="chatBtn">✦ Ask about my work</button>
 <div id="chatPanel">
-  <div class="chead"><div>Ask my AI<small>It knows my projects &amp; skills</small></div><span id="chatClose" style="cursor:pointer">✕</span></div>
+  <div class="chead"><div>Ask my AI<small>Grounded in Erfanul's work</small></div><button id="chatClose" style="background:none;border:0;color:var(--muted);font-size:1.3rem;cursor:pointer">×</button></div>
   <div id="msgs"></div>
-  <div class="sugg" id="sugg"></div>
-  <div class="cinput"><input id="cin" placeholder="e.g. What can Erfanul build for me?"><button id="csend">Send</button></div>
+  <div id="sugg"></div>
+  <div class="cinput"><input id="cin" placeholder="What can Erfanul build for me?"><button class="btn primary" id="csend" style="padding:.55rem .9rem">Send</button></div>
 </div>
 
-<script src="app.js"></script>
+<script type="module" src="app.js"></script>
 </body>
 </html>
