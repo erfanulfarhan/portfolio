@@ -201,14 +201,21 @@ if (finePointer) cards.forEach((card) => {
   const inn = card.querySelector('.pcard__in');
   card.addEventListener('mousemove', (e) => { const r = card.getBoundingClientRect(); inn.style.setProperty('--mx', (e.clientX - r.left) + 'px'); inn.style.setProperty('--my', (e.clientY - r.top) + 'px'); });
 });
-// mouse drag to slide the whole works track (touch keeps native scroll)
-let down = false, moved = 0, sx = 0, sl = 0;
-track.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse') return; down = true; moved = 0; sx = e.clientX; sl = track.scrollLeft; track.classList.add('grabbing'); e.preventDefault(); });
-addEventListener('pointermove', (e) => { if (!down) return; const dx = e.clientX - sx; moved = Math.max(moved, Math.abs(dx)); track.scrollLeft = sl - dx; });
+// mouse drag to slide the whole works track (touch keeps native scroll).
+// 'grabbing' is only added once an actual drag starts, so plain clicks still hit
+// the card links (Live / Code) normally.
+let down = false, dragged = false, sx = 0, sl = 0;
+track.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse') return; down = true; dragged = false; sx = e.clientX; sl = track.scrollLeft; });
+addEventListener('pointermove', (e) => {
+  if (!down) return;
+  const dx = e.clientX - sx;
+  if (!dragged && Math.abs(dx) > 6) { dragged = true; track.classList.add('grabbing'); }
+  if (dragged) track.scrollLeft = sl - dx;
+});
 const endDrag = () => { if (down) { down = false; track.classList.remove('grabbing'); } };
 addEventListener('pointerup', endDrag); addEventListener('pointercancel', endDrag);
 track.addEventListener('dragstart', (e) => e.preventDefault());  // no native image/text drag
-track.addEventListener('click', (e) => { if (moved > 6) { e.preventDefault(); e.stopPropagation(); } }, true);  // suppress click after a drag
+track.addEventListener('click', (e) => { if (dragged) { e.preventDefault(); e.stopPropagation(); dragged = false; } }, true);  // swallow the click only right after a drag
 requestAnimationFrame(updateActive);
 
 /* ============ REVEALS / STATS / CHIPS ============ */
