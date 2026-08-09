@@ -4,12 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Erfanul Hakim Farhan — AI &amp; Automation Developer</title>
-<meta name="description" content="Erfanul Hakim Farhan — AI &amp; Automation Developer. Interactive 3D, immersive portfolio of AI web apps, RAG systems, and automation.">
+<meta name="description" content="Erfanul Hakim Farhan — AI &amp; Automation Developer. An immersive portfolio of AI web apps, RAG systems, and automation. Interactive 3D, sound, motion.">
 <style>
   :root{
-    --bg:#05060a; --bg2:#0a0c13; --card:#0f121c; --ink:#f3f5fb; --muted:#9aa2ba; --faint:#5f6784;
-    --line:#1b1f2e; --a1:#6366f1; --a2:#22d3ee; --a3:#a855f7;
-    --grad:linear-gradient(100deg,var(--a1),var(--a3) 55%,var(--a2));
+    --bg:#060713; --bg2:#0a0c1d; --card:#0e1024; --ink:#f4f5ff; --muted:#a4aad0; --faint:#5b6294;
+    --line:#1e1b3c;
+    --v:#8b5cf6; --p:#ec4899; --c:#22d3ee; --b:#3b82f6;
+    --grad:linear-gradient(100deg,var(--v),var(--p) 45%,var(--c));
   }
   *{box-sizing:border-box}
   html{scroll-behavior:smooth}
@@ -17,149 +18,200 @@
     font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;overflow-x:hidden}
   a{color:inherit;text-decoration:none}
   .wrap{max-width:1180px;margin:0 auto;padding:0 1.4rem}
-  .grad-text{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
-  ::selection{background:var(--a3);color:#fff}
+  ::selection{background:var(--p);color:#fff}
+  .grad-text{background:linear-gradient(100deg,var(--v),var(--p),var(--c),var(--v));background-size:300% 100%;
+    -webkit-background-clip:text;background-clip:text;color:transparent;animation:hue 9s linear infinite}
+  @keyframes hue{to{background-position:300% 0}}
+
+  /* custom cursor */
+  .cursor,.cursor-dot{position:fixed;top:0;left:0;pointer-events:none;z-index:9999;border-radius:50%;
+    transform:translate(-50%,-50%);will-change:transform}
+  .cursor{width:34px;height:34px;border:1.5px solid var(--c);mix-blend-mode:difference;
+    transition:width .25s,height .25s,background .25s,border-color .25s,opacity .3s}
+  .cursor.grow{width:70px;height:70px;background:rgba(255,255,255,.12);border-color:var(--p)}
+  .cursor-dot{width:6px;height:6px;background:var(--c)}
+  body.cc{cursor:none}
+  body.cc a,body.cc button,body.cc input{cursor:none}
+  @media(hover:none){.cursor,.cursor-dot{display:none}}
+
+  /* preloader */
+  .preload{position:fixed;inset:0;z-index:10000;background:var(--bg);display:grid;place-items:center;
+    transition:opacity .7s ease,visibility .7s}
+  .preload.done{opacity:0;visibility:hidden}
+  .preload .pc{text-align:center}
+  .preload .count{font-size:clamp(3.5rem,15vw,9rem);font-weight:850;letter-spacing:-.04em;line-height:1}
+  .preload small{display:block;color:var(--faint);letter-spacing:.3em;text-transform:uppercase;font-size:.7rem;margin-top:.6rem}
+  .prebar{height:2px;width:min(320px,60vw);background:var(--line);border-radius:9px;margin:1.2rem auto 0;overflow:hidden}
+  .prebar>span{display:block;height:100%;width:0;background:var(--grad)}
 
   /* nav */
-  nav{position:fixed;top:0;left:0;right:0;z-index:60;backdrop-filter:blur(12px);
-    background:rgba(5,6,10,.5);border-bottom:1px solid var(--line)}
+  nav{position:fixed;top:0;left:0;right:0;z-index:60;backdrop-filter:blur(14px);
+    background:rgba(6,7,19,.5);border-bottom:1px solid var(--line)}
   nav .wrap{display:flex;align-items:center;justify-content:space-between;height:62px}
   .brand{font-weight:800;letter-spacing:-.02em}
   .navr{display:flex;align-items:center;gap:1.3rem}
-  .navr a{color:var(--muted);font-size:.92rem;transition:.2s}
+  .navr a{color:var(--muted);font-size:.92rem;transition:.2s;position:relative}
   .navr a:hover{color:var(--ink)}
   .sound{display:inline-flex;align-items:center;gap:.4rem;background:transparent;border:1px solid var(--line);
     color:var(--muted);border-radius:999px;padding:.35rem .7rem;font:600 .78rem/1 inherit;cursor:pointer;transition:.2s}
-  .sound:hover{border-color:var(--a2);color:var(--ink)}
-  .sound.on{border-color:var(--a2);color:var(--a2)}
+  .sound.on{border-color:var(--c);color:var(--c);box-shadow:0 0 20px rgba(34,211,238,.25)}
   @media(max-width:640px){.navr a.nl{display:none}}
 
-  /* hero with 3D canvas */
+  /* hero */
   header{position:relative;min-height:100svh;display:flex;align-items:center;overflow:hidden}
-  #gl{position:absolute;inset:0;z-index:0}
-  .hero{position:relative;z-index:2;pointer-events:none}
+  #gl{position:absolute;inset:0;z-index:1}
+  .mesh{position:absolute;inset:-30%;z-index:0;filter:blur(90px);opacity:.6;
+    background:
+      radial-gradient(40% 40% at 25% 30%,rgba(139,92,246,.5),transparent 60%),
+      radial-gradient(40% 40% at 75% 40%,rgba(236,72,153,.42),transparent 60%),
+      radial-gradient(45% 45% at 55% 75%,rgba(34,211,238,.4),transparent 60%);
+    animation:mesh 24s ease-in-out infinite}
+  @keyframes mesh{0%,100%{transform:rotate(0) scale(1)}50%{transform:rotate(20deg) scale(1.15)}}
+  .hero{position:relative;z-index:3;pointer-events:none}
   .hero .in{pointer-events:auto}
-  .hello{color:var(--a2);font-weight:600;letter-spacing:.1em;text-transform:uppercase;font-size:.8rem;
-    opacity:0;transform:translateY(12px)}
-  h1{font-size:clamp(2.6rem,9vw,6rem);line-height:.98;margin:.5rem 0 .3rem;font-weight:850;letter-spacing:-.035em}
-  h1 .l{display:inline-block;opacity:0;transform:translateY(40px) rotate(6deg)}
-  .role{font-size:clamp(1.1rem,3vw,1.7rem);font-weight:700;color:var(--muted);min-height:1.5em;
-    opacity:0;transform:translateY(12px)}
-  .lead{color:var(--muted);max-width:46ch;margin:1.1rem 0 1.8rem;opacity:0;transform:translateY(12px)}
-  .cta{display:flex;gap:.8rem;flex-wrap:wrap;opacity:0;transform:translateY(12px)}
-  .btn{padding:.85rem 1.4rem;border-radius:999px;font-weight:700;cursor:pointer;border:0;transition:.2s;font-size:1rem}
-  .btn.primary{background:var(--grad);color:#fff;background-size:200% 200%;animation:shift 6s ease infinite}
-  .btn.primary:hover{transform:translateY(-2px);box-shadow:0 14px 40px rgba(124,92,255,.4)}
+  .hello{color:var(--c);font-weight:600;letter-spacing:.14em;text-transform:uppercase;font-size:.8rem;opacity:0;transform:translateY(12px)}
+  h1{font-size:clamp(2.7rem,9.5vw,6.4rem);line-height:.95;margin:.5rem 0 .3rem;font-weight:850;letter-spacing:-.04em}
+  h1 .l{display:inline-block;opacity:0;transform:translateY(50px) rotate(8deg)}
+  .role{font-size:clamp(1.1rem,3vw,1.7rem);font-weight:700;color:var(--muted);min-height:1.5em;opacity:0;transform:translateY(12px)}
+  .lead{color:var(--muted);max-width:46ch;margin:1.1rem 0 1.9rem;opacity:0;transform:translateY(12px)}
+  .cta{display:flex;gap:.9rem;flex-wrap:wrap;opacity:0;transform:translateY(12px)}
+  .btn{padding:.9rem 1.5rem;border-radius:999px;font-weight:700;cursor:pointer;border:0;transition:.2s;font-size:1rem;position:relative}
+  .btn.primary{background:var(--grad);background-size:200% 200%;color:#fff;animation:shift 6s ease infinite;box-shadow:0 8px 30px rgba(139,92,246,.35)}
+  .btn.primary:hover{box-shadow:0 16px 50px rgba(236,72,153,.45)}
   @keyframes shift{50%{background-position:100% 50%}}
   .btn.ghost{background:rgba(255,255,255,.03);color:var(--ink);border:1px solid var(--line)}
-  .btn.ghost:hover{border-color:var(--a2)}
-  .scrollcue{position:absolute;bottom:1.4rem;left:50%;transform:translateX(-50%);z-index:2;color:var(--faint);
-    font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;animation:bob 2s ease-in-out infinite}
-  @keyframes bob{50%{transform:translate(-50%,6px)}}
+  .btn.ghost:hover{border-color:var(--c)}
+  .scrollcue{position:absolute;bottom:1.4rem;left:50%;transform:translateX(-50%);z-index:3;color:var(--faint);
+    font-size:.72rem;letter-spacing:.25em;text-transform:uppercase;animation:bob 2s ease-in-out infinite}
+  @keyframes bob{50%{transform:translate(-50%,7px)}}
 
-  section{position:relative;padding:6rem 0;z-index:1}
-  .eyebrow{color:var(--a2);font-weight:600;letter-spacing:.1em;text-transform:uppercase;font-size:.78rem}
-  h2{font-size:clamp(1.9rem,5vw,3rem);margin:.4rem 0 .4rem;font-weight:850;letter-spacing:-.02em}
+  /* marquee */
+  .marquee{overflow:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+    padding:1.3rem 0;background:linear-gradient(90deg,var(--bg2),var(--bg))}
+  .mrow{display:flex;gap:2.4rem;width:max-content;white-space:nowrap;animation:marq 32s linear infinite}
+  .mrow.rev{animation-direction:reverse;opacity:.5}
+  .mrow span{font-size:clamp(1.4rem,4vw,2.6rem);font-weight:850;letter-spacing:-.02em;color:transparent;
+    -webkit-text-stroke:1px var(--faint);display:inline-flex;align-items:center;gap:2.4rem}
+  .mrow span.fill{color:var(--ink);-webkit-text-stroke:0}
+  .mrow span i{color:var(--p);font-style:normal}
+  @keyframes marq{to{transform:translateX(-50%)}}
+
+  section{position:relative;padding:6.5rem 0;z-index:1}
+  .eyebrow{color:var(--c);font-weight:600;letter-spacing:.14em;text-transform:uppercase;font-size:.78rem}
+  h2{font-size:clamp(2rem,5.5vw,3.4rem);margin:.4rem 0 .4rem;font-weight:850;letter-spacing:-.025em;overflow:hidden}
+  h2 .ln{display:inline-block;transform:translateY(110%);transition:transform .9s cubic-bezier(.2,.8,.2,1)}
+  h2.in .ln{transform:none}
   .reveal{opacity:0;transform:translateY(30px)}
-  .reveal.in{opacity:1;transform:none;transition:.8s cubic-bezier(.2,.7,.2,1)}
+  .reveal.in{opacity:1;transform:none;transition:.85s cubic-bezier(.2,.7,.2,1)}
 
-  /* carousel */
-  .work h2 span{color:var(--faint);font-weight:400;font-size:.5em;letter-spacing:0}
+  .work h2 span{color:var(--faint);font-weight:400;font-size:.45em;letter-spacing:0}
   .carousel{position:relative;margin-top:2rem}
-  .track{display:flex;gap:1.2rem;overflow-x:auto;padding:1.5rem .2rem 2rem;scroll-snap-type:x mandatory;
-    scrollbar-width:none;perspective:1400px}
+  .track{display:flex;gap:1.3rem;overflow-x:auto;padding:1.6rem .2rem 2rem;scroll-snap-type:x mandatory;
+    scrollbar-width:none;perspective:1500px}
   .track::-webkit-scrollbar{display:none}
-  .pcard{scroll-snap-align:center;flex:0 0 clamp(280px,72vw,420px);background:var(--card);border:1px solid var(--line);
-    border-radius:20px;padding:1.6rem;transition:transform .25s cubic-bezier(.2,.7,.2,1),box-shadow .25s,border-color .25s;
-    transform-style:preserve-3d;position:relative;overflow:hidden;min-height:340px;display:flex;flex-direction:column}
+  .pcard{scroll-snap-align:center;flex:0 0 clamp(280px,74vw,430px);background:var(--card);border:1px solid var(--line);
+    border-radius:22px;padding:1.7rem;transition:transform .25s cubic-bezier(.2,.7,.2,1),box-shadow .25s,border-color .25s;
+    transform-style:preserve-3d;position:relative;overflow:hidden;min-height:350px;display:flex;flex-direction:column}
   .pcard::before{content:"";position:absolute;inset:0;opacity:0;transition:.3s;pointer-events:none;
-    background:radial-gradient(500px circle at var(--mx,50%) var(--my,30%),rgba(124,92,255,.18),transparent 45%)}
-  .pcard:hover::before{opacity:1}
-  .pcard:hover{border-color:#34364d;box-shadow:0 30px 70px rgba(0,0,0,.55)}
-  .pcard .num{position:absolute;top:1rem;right:1.3rem;font-size:3.2rem;font-weight:850;color:#151827;letter-spacing:-.04em}
+    background:radial-gradient(560px circle at var(--mx,50%) var(--my,30%),rgba(236,72,153,.22),transparent 45%)}
+  .pcard::after{content:"";position:absolute;inset:0;border-radius:22px;padding:1px;pointer-events:none;opacity:0;transition:.3s;
+    background:linear-gradient(130deg,var(--v),var(--p),var(--c));
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+  .pcard:hover::before,.pcard:hover::after{opacity:1}
+  .pcard:hover{box-shadow:0 34px 80px rgba(0,0,0,.6)}
+  .pcard .num{position:absolute;top:1rem;right:1.4rem;font-size:3.4rem;font-weight:850;letter-spacing:-.05em;
+    color:transparent;-webkit-text-stroke:1px #23264a}
   .pcard .live{display:inline-flex;align-items:center;gap:.4rem;color:#34d399;font-size:.78rem;font-weight:600;margin-bottom:.6rem}
   .pcard .dot{width:8px;height:8px;border-radius:50%;background:#34d399;box-shadow:0 0 0 0 rgba(52,211,153,.6);animation:pulse 1.8s infinite}
   @keyframes pulse{70%{box-shadow:0 0 0 8px rgba(52,211,153,0)}100%{box-shadow:0 0 0 0 rgba(52,211,153,0)}}
-  .pcard h3{font-size:1.4rem;margin:.1rem 0 .5rem;position:relative;z-index:1}
+  .pcard h3{font-size:1.45rem;margin:.1rem 0 .5rem;position:relative;z-index:1}
   .pcard p{color:var(--muted);font-size:.95rem;margin:0 0 1rem;flex:1;position:relative;z-index:1}
   .tags{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1rem;position:relative;z-index:1}
-  .tag{font-size:.72rem;color:var(--a2);border:1px solid var(--line);border-radius:999px;padding:.2rem .6rem}
-  .plinks{display:flex;gap:1rem;position:relative;z-index:1}
-  .plinks a{font-size:.9rem;font-weight:650;color:#c7cbe0}
-  .plinks a:hover{color:var(--a2)}
+  .tag{font-size:.72rem;color:var(--c);border:1px solid var(--line);border-radius:999px;padding:.2rem .6rem}
+  .plinks{display:flex;gap:1.1rem;position:relative;z-index:1}
+  .plinks a{font-size:.9rem;font-weight:650;color:#c8ccf0}.plinks a:hover{color:var(--p)}
   .carbtns{display:flex;gap:.6rem;justify-content:center;margin-top:.5rem}
-  .carbtns button{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--card);
+  .carbtns button{width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:var(--card);
     color:var(--ink);font-size:1.1rem;cursor:pointer;transition:.2s}
-  .carbtns button:hover{border-color:var(--a2);color:var(--a2);transform:translateY(-2px)}
+  .carbtns button:hover{border-color:var(--p);color:var(--p);box-shadow:0 0 24px rgba(236,72,153,.3)}
   .hint{color:var(--faint);font-size:.8rem;text-align:center;margin-top:.4rem}
 
-  /* about / skills */
   .about p{color:var(--muted);max-width:60ch;font-size:1.1rem}
-  .stats{display:flex;gap:2.5rem;margin-top:2rem;flex-wrap:wrap}
-  .stat b{display:block;font-size:2.4rem;font-weight:850}.stat span{color:var(--faint);font-size:.85rem}
-  .chips{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1.4rem}
+  .stats{display:flex;gap:2.6rem;margin-top:2rem;flex-wrap:wrap}
+  .stat b{display:block;font-size:2.6rem;font-weight:850}.stat span{color:var(--faint);font-size:.85rem}
+  .chips{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1.5rem}
   .chip{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:.5rem .9rem;font-size:.9rem;transition:.2s}
-  .chip:hover{border-color:var(--a3);transform:translateY(-3px)}
+  .chip:hover{border-color:var(--p);transform:translateY(-4px);color:#fff}
 
   .contact{text-align:center}
-  .contact p{color:var(--muted);max-width:46ch;margin:.4rem auto 1.6rem}
+  .contact p{color:var(--muted);max-width:46ch;margin:.4rem auto 1.8rem}
+  .contact .big{font-size:clamp(1.4rem,5vw,2.4rem);font-weight:800}
   footer{border-top:1px solid var(--line);padding:2rem 0;text-align:center;color:var(--faint);font-size:.85rem}
 
-  /* chat */
   #chatBtn{position:fixed;right:1.2rem;bottom:1.2rem;z-index:70;border:0;cursor:pointer;border-radius:999px;
     padding:.9rem 1.2rem;font-weight:700;color:#fff;background:var(--grad);background-size:200% 200%;
-    animation:shift 6s ease infinite;box-shadow:0 12px 30px rgba(124,92,255,.4)}
+    animation:shift 6s ease infinite;box-shadow:0 12px 34px rgba(139,92,246,.45)}
   #chatPanel{position:fixed;right:1.2rem;bottom:5rem;z-index:70;width:min(370px,92vw);height:min(520px,72vh);
-    background:var(--bg2);border:1px solid var(--line);border-radius:18px;display:none;flex-direction:column;
-    box-shadow:0 24px 70px rgba(0,0,0,.6);overflow:hidden}
+    background:var(--bg2);border:1px solid var(--line);border-radius:18px;display:none;flex-direction:column;box-shadow:0 24px 70px rgba(0,0,0,.6);overflow:hidden}
   #chatPanel.open{display:flex}
   .chead{padding:.9rem 1rem;border-bottom:1px solid var(--line);font-weight:700;display:flex;justify-content:space-between;align-items:center}
   .chead small{color:var(--muted);font-weight:400;display:block;font-size:.78rem}
   #msgs{flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:.6rem}
   .m{max-width:85%;padding:.6rem .85rem;border-radius:12px;font-size:.92rem;line-height:1.5}
-  .m.u{align-self:flex-end;background:var(--a1);color:#fff;border-bottom-right-radius:4px}
+  .m.u{align-self:flex-end;background:var(--v);color:#fff;border-bottom-right-radius:4px}
   .m.a{align-self:flex-start;background:var(--card);border:1px solid var(--line);border-bottom-left-radius:4px}
   .cinput{display:flex;gap:.5rem;padding:.7rem;border-top:1px solid var(--line)}
   .cinput input{flex:1;background:var(--card);border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:.6rem .8rem;outline:none;font:inherit}
   #sugg{display:flex;flex-wrap:wrap;gap:.4rem;padding:0 .7rem .5rem}
   #sugg button{background:var(--card);border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:.3rem .6rem;font-size:.78rem;cursor:pointer}
-  @media(prefers-reduced-motion:reduce){*{animation-duration:.001s!important;transition-duration:.001s!important}}
+  @media(prefers-reduced-motion:reduce){*{animation-duration:.001s!important;transition-duration:.01s!important}}
 </style>
 </head>
 <body>
+<div class="preload" id="preload"><div class="pc">
+  <div class="count grad-text" id="pcount">0</div>
+  <small>Erfanul Hakim Farhan</small>
+  <div class="prebar"><span id="prebar"></span></div>
+</div></div>
+<div class="cursor" id="cursor"></div><div class="cursor-dot" id="cursorDot"></div>
+
 <nav><div class="wrap">
   <div class="brand grad-text">Erfanul Hakim Farhan</div>
   <div class="navr">
-    <a class="nl" href="#work">Work</a>
-    <a class="nl" href="#about">About</a>
-    <a class="nl" href="#contact">Contact</a>
-    <button class="sound" id="soundBtn" aria-pressed="false">🔇 <span>Sound</span></button>
+    <a class="nl" href="#work">Work</a><a class="nl" href="#about">About</a><a class="nl" href="#contact">Contact</a>
+    <button class="sound" id="soundBtn" data-magnetic aria-pressed="false">🔇 <span>Sound</span></button>
   </div>
 </div></nav>
 
 <header>
+  <div class="mesh"></div>
   <canvas id="gl"></canvas>
   <div class="hero wrap"><div class="in">
     <div class="hello" id="hello">AI &amp; Automation Developer</div>
     <h1 id="title"></h1>
     <div class="role" id="role"></div>
-    <p class="lead" id="lead">I build AI-powered web apps, RAG systems, and automation that watches, alerts, and acts — shipped live, end to end.</p>
+    <p class="lead" id="lead">I build AI-powered web apps, RAG systems, and automation that watches, alerts, and acts — designed, built, and shipped live.</p>
     <div class="cta" id="cta">
-      <button class="btn primary" data-scroll="#work">View my work</button>
-      <a class="btn ghost" href="mailto:erfanul100@gmail.com">Hire me</a>
+      <button class="btn primary" data-magnetic data-scroll="#work">View my work</button>
+      <a class="btn ghost" data-magnetic href="mailto:erfanul100@gmail.com">Hire me</a>
     </div>
   </div></div>
   <div class="scrollcue">scroll ↓</div>
 </header>
 
+<div class="marquee" aria-hidden="true">
+  <div class="mrow" id="mrow1"></div>
+  <div class="mrow rev" id="mrow2"></div>
+</div>
+
 <section class="work" id="work">
   <div class="wrap">
     <span class="eyebrow reveal">Selected work</span>
-    <h2 class="reveal">Things I've shipped <span>— drag or use the arrows</span></h2>
+    <h2 data-reveal-line>Things I've shipped <span>— drag or use the arrows</span></h2>
   </div>
   <div class="carousel">
     <div class="track" id="track"></div>
-    <div class="carbtns"><button id="prev" aria-label="Previous">←</button><button id="next" aria-label="Next">→</button></div>
+    <div class="carbtns"><button id="prev" data-magnetic aria-label="Previous">←</button><button id="next" data-magnetic aria-label="Next">→</button></div>
     <p class="hint">Tip: turn on Sound (top-right) for the full ride.</p>
   </div>
 </section>
@@ -167,8 +219,8 @@
 <section class="about" id="about">
   <div class="wrap">
     <span class="eyebrow reveal">About</span>
-    <h2 class="reveal">I turn ideas into live products — fast.</h2>
-    <p class="reveal">From RAG knowledge bases and embeddable AI widgets to automation bots and full-stack apps with auth, real-time data, and analytics — I design it, build it, and deploy it. Available for freelance work.</p>
+    <h2 data-reveal-line>I turn ideas into live products — fast.</h2>
+    <p class="reveal">From RAG knowledge bases and embeddable AI widgets to automation bots and full-stack apps with auth, real-time data, and analytics — I design it, build it, and deploy it.</p>
     <div class="stats reveal">
       <div class="stat"><b data-count="6">0</b><span>Live products</span></div>
       <div class="stat"><b data-count="100">0</b><span>% shipped &amp; deployed</span></div>
@@ -181,19 +233,18 @@
 <section class="contact" id="contact">
   <div class="wrap">
     <span class="eyebrow reveal">Contact</span>
-    <h2 class="reveal">Let's build something.</h2>
+    <h2 data-reveal-line>Let's build something.</h2>
     <p class="reveal">Have a project in mind — an AI feature, an automation, a full app? Let's talk.</p>
-    <div class="reveal"><a class="btn primary" href="mailto:erfanul100@gmail.com">erfanul100@gmail.com</a></div>
+    <div class="reveal"><a class="btn primary big" data-magnetic href="mailto:erfanul100@gmail.com">erfanul100@gmail.com</a></div>
   </div>
 </section>
 
 <footer>© <span id="yr"></span> Erfanul Hakim Farhan · Built with vanilla JS, Three.js &amp; an AI assistant · <a class="grad-text" href="https://github.com/erfanulfarhan" target="_blank" rel="noopener">github.com/erfanulfarhan</a></footer>
 
-<button id="chatBtn">✦ Ask about my work</button>
+<button id="chatBtn" data-magnetic>✦ Ask about my work</button>
 <div id="chatPanel">
   <div class="chead"><div>Ask my AI<small>Grounded in Erfanul's work</small></div><button id="chatClose" style="background:none;border:0;color:var(--muted);font-size:1.3rem;cursor:pointer">×</button></div>
-  <div id="msgs"></div>
-  <div id="sugg"></div>
+  <div id="msgs"></div><div id="sugg"></div>
   <div class="cinput"><input id="cin" placeholder="What can Erfanul build for me?"><button class="btn primary" id="csend" style="padding:.55rem .9rem">Send</button></div>
 </div>
 
