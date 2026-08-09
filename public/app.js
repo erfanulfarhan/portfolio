@@ -166,21 +166,35 @@ track.innerHTML = projects.map((p, i) => `
     </div>
   </article>`).join('');
 const cards = $$('.pcard');
-$('#dots').innerHTML = cards.map((_, i) => `<i data-i="${i}"></i>`).join('');
-const dots = $$('#dots i');
-function setDot(a) { dots.forEach((d, i) => d.classList.toggle('on', i === a)); }
-let cflRaf = 0;
+const dotsWrap = $('#dots');
+let dots = [], stops = [], cflRaf = 0, rzT = 0;
 const padL = () => parseFloat(getComputedStyle(track).paddingLeft) || 0;
-function updateActive() {
-  const target = track.scrollLeft + padL(); let best = 0, bestD = 1e9;
-  cards.forEach((card, i) => { const d = Math.abs(card.offsetLeft - target); if (d < bestD) { bestD = d; best = i; } });
-  setDot(best);
+function setDot(a) { dots.forEach((d, i) => d.classList.toggle('on', i === a)); }
+// Reachable scroll positions only — cards that can't reach the left edge
+// collapse into a single "end" stop, so there are no phantom/empty dots.
+function computeStops() {
+  const max = Math.max(0, track.scrollWidth - track.clientWidth), pl = padL();
+  stops = [];
+  cards.forEach((card) => {
+    const s = Math.max(0, Math.min(card.offsetLeft - pl, max));
+    if (!stops.length || s - stops[stops.length - 1] > 8) stops.push(s);
+  });
+  if (!stops.length) stops = [0];
+  if (stops[stops.length - 1] < max - 8) stops.push(max);
+  dotsWrap.innerHTML = stops.map((_, i) => `<i data-i="${i}"></i>`).join('');
+  dots = $$('#dots i');
+  dots.forEach((d) => (d.onclick = () => goStop(+d.dataset.i)));
+  updateActive();
 }
+function currentStop() { let best = 0, bd = 1e9; stops.forEach((s, i) => { const d = Math.abs(s - track.scrollLeft); if (d < bd) { bd = d; best = i; } }); return best; }
+function updateActive() { setDot(currentStop()); }
+function goStop(i) { i = Math.max(0, Math.min(stops.length - 1, i)); track.scrollTo({ left: stops[i], behavior: 'smooth' }); sfx.nav(); }
 track.addEventListener('scroll', () => { if (!cflRaf) cflRaf = requestAnimationFrame(() => { updateActive(); cflRaf = 0; }); }, { passive: true });
-function centerOn(i) { const card = cards[i]; if (!card) return; card.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' }); sfx.nav(); }
-$('#next').onclick = () => { const cur = dots.findIndex((d) => d.classList.contains('on')); centerOn(Math.min(cards.length - 1, cur + 1)); };
-$('#prev').onclick = () => { const cur = dots.findIndex((d) => d.classList.contains('on')); centerOn(Math.max(0, cur - 1)); };
-dots.forEach((d) => (d.onclick = () => centerOn(+d.dataset.i)));
+$('#next').onclick = () => goStop(currentStop() + 1);
+$('#prev').onclick = () => goStop(currentStop() - 1);
+addEventListener('resize', () => { clearTimeout(rzT); rzT = setTimeout(computeStops, 200); });
+computeStops();
+addEventListener('load', () => setTimeout(computeStops, 300));
 // desktop hover tilt (outer transform; coverflow scales the inner element → no conflict)
 if (finePointer) cards.forEach((card) => {
   const inn = card.querySelector('.pcard__in');
