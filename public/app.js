@@ -11,9 +11,9 @@ const finePointer = matchMedia('(hover:hover) and (pointer:fine)').matches;
 const isMobile = innerWidth < 720;
 $('#yr').textContent = new Date().getFullYear();
 // always land at the top on reload (don't restore prior scroll position)
-if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-scrollTo(0, 0);
-addEventListener('load', () => scrollTo(0, 0));
+if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual';
+window.scrollTo(0, 0);
+addEventListener('load', () => window.scrollTo(0, 0));
 
 function goTo(sel) { const t = $(sel); if (t) t.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' }); }
 
@@ -206,7 +206,7 @@ $$('[data-scroll]').forEach((b) => (b.onclick = () => { sfx.click(); goTo(b.data
 $$('.navr a[href^="#"]').forEach((a) => (a.onclick = (e) => { e.preventDefault(); goTo(a.getAttribute('href')); }));
 
 /* ============ CHAT ============ */
-const panel = $('#chatPanel'), msgs = $('#msgs'), history = [];
+const panel = $('#chatPanel'), msgs = $('#msgs'), chatHist = [];
 const add = (role, text) => { const d = document.createElement('div'); d.className = 'm ' + (role === 'user' ? 'u' : 'a'); d.textContent = text; msgs.appendChild(d); msgs.scrollTop = msgs.scrollHeight; return d; };
 $('#chatBtn').onclick = () => { panel.classList.toggle('open'); sfx.click(); if (panel.classList.contains('open') && !msgs.childElementCount) add('a', "Hi! I'm Erfanul's assistant. Ask me about his projects, skills, or what he can build for you."); };
 $('#chatClose').onclick = () => panel.classList.remove('open');
@@ -214,9 +214,9 @@ $('#sugg').innerHTML = ['What can Erfanul build for me?', 'Tell me about SiteSag
 $$('#sugg button').forEach((b) => (b.onclick = () => { $('#cin').value = b.textContent; send(); }));
 async function send() {
   const input = $('#cin'), text = input.value.trim(); if (!text) return;
-  input.value = ''; add('user', text); history.push({ role: 'user', text });
+  input.value = ''; add('user', text); chatHist.push({ role: 'user', text });
   const think = add('assistant', '…');
-  try { const r = await fetch('/api/chat', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ message: text, history: history.slice(0, -1) }) }); const d = await r.json(); think.textContent = r.ok ? d.text : '⚠️ ' + (d.error || 'Something went wrong.'); if (r.ok) history.push({ role: 'assistant', text: d.text }); }
+  try { const r = await fetch('/api/chat', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ message: text, history: chatHist.slice(0, -1) }) }); const d = await r.json(); think.textContent = r.ok ? d.text : '⚠️ ' + (d.error || 'Something went wrong.'); if (r.ok) chatHist.push({ role: 'assistant', text: d.text }); }
   catch { think.textContent = '⚠️ Network error — try again.'; }
 }
 $('#csend').onclick = send; $('#cin').addEventListener('keydown', (e) => { if (e.key === 'Enter') send(); });
