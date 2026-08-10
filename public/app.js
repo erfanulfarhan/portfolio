@@ -206,7 +206,14 @@ function computeStops() {
   updateActive();
 }
 function currentStop() { let best = 0, bd = 1e9; stops.forEach((s, i) => { const d = Math.abs(s - track.scrollLeft); if (d < bd) { bd = d; best = i; } }); return best; }
-function updateActive() { setDot(currentStop()); }
+const trackProg = $('#trackProg');
+function updateActive() {
+  setDot(currentStop());
+  if (trackProg) {
+    const max = track.scrollWidth - track.clientWidth;
+    trackProg.style.transform = `scaleX(${max > 0 ? Math.min(1, track.scrollLeft / max) : 0})`;
+  }
+}
 function goStop(i) { i = Math.max(0, Math.min(stops.length - 1, i)); track.scrollTo({ left: stops[i], behavior: 'smooth' }); sfx.nav(); }
 track.addEventListener('scroll', () => { if (!cflRaf) cflRaf = requestAnimationFrame(() => { updateActive(); cflRaf = 0; }); }, { passive: true });
 $('#next').onclick = () => goStop(currentStop() + 1);
