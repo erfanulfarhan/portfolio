@@ -2,7 +2,7 @@
 // Groq (OpenAI-compatible) answers as Erfanul's assistant, grounded in the
 // profile below. The key stays server-side.
 
-const MODEL = "llama-3.3-70b-versatile";
+const MODEL = "openai/gpt-oss-120b";
 const ENDPOINT = "https://api.groq.com/openai/v1/chat/completions";
 
 const PROFILE = `
@@ -28,7 +28,7 @@ SKILLS
 PROJECTS
 1. Friday, a voice-first AI assistant you talk to and it talks back. Audio-reactive
    orb, speech-to-text via Groq Whisper and browser speech synthesis, a Motion-animated
-   UI, and a Groq (Llama 3.3 70B) brain. Built with React + Tailwind + shadcn/ui.
+   UI, and a Groq (GPT OSS 120B) brain. Built with React + Tailwind + shadcn/ui.
    Live at friday-erfanul.vercel.app.
 2. SiteSage, an embeddable AI chat widget for ANY website. Create a bot in a
    dashboard, train it on pasted text or web pages, and drop it in with one line
