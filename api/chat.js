@@ -46,16 +46,30 @@ PROJECTS
    paste notes, then ask questions and get answers WITH citations to the exact
    source passage. Semantic vector search with Supabase pgvector; embeddings run
    in the browser. Live at ask-my-docs-erfanul.vercel.app.
-5. StudyBuddy, an AI study companion. Drop a PDF or paste notes to get instant
+5. Slate, a file store with passwordless email sign-in. Drag and drop upload,
+   browse by type, share by email, search and sort. Download links are minted per
+   request and expire, so a shared URL stops working instead of living forever.
+   Stack: TypeScript, Next.js, Appwrite. Live at store-it-c-e113.vercel.app.
+6. Exam Toolkit, free revision tools for Edexcel International A Level and IGCSE.
+   A UMS grade calculator built from every published grade boundary, past papers
+   beside mark schemes that stay locked until you attempt the question, a mock
+   timer and a study planner. Live at edexcel-grade-calc.vercel.app.
+7. JARVIS, an offline-first macOS voice assistant: speech in, speech out, running
+   locally so it keeps working without a connection.
+8. GazeKit, a macOS tool that calibrates and verifies gaze correction, measuring
+   whether it actually works rather than taking the vendor's word for it.
+9. NSU Result Checker, looks up an NSU undergraduate admission result from a test
+   pass number so applicants do not have to sit refreshing a portal.
+10. StudyBuddy, an AI study companion. Drop a PDF or paste notes to get instant
    summaries, grounded Q&A, and auto-generated interactive quizzes. Live at
    studybuddy-ai-pi.vercel.app.
-6. Doomsday Tracker, a cinematic watch-tracker with accounts, cloud-synced
+11. Doomsday Tracker, a cinematic watch-tracker with accounts, cloud-synced
    progress, a private friends-and-family leaderboard, live stats charts, and an
    interactive animated UI. Live at doomsday-tracker-erfanul.vercel.app.
-7. Cineplex Automation Platform, a Telegram bot plus a public web app that
+12. Cineplex Automation Platform, a Telegram bot plus a public web app that
    track cinema seat availability in real time, render seat maps, and can book
    tickets automatically the moment they go on sale. Stack: Python, Playwright.
-8. Result Watchers, bots that watch university admission pages and a logged-in
+13. Result Watchers, bots that watch university admission pages and a logged-in
    applicant portal, and alert by email/iMessage the moment results publish. Run
    free on GitHub Actions.
 
