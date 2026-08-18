@@ -58,18 +58,16 @@ PROJECTS
    locally so it keeps working without a connection.
 8. GazeKit, a macOS tool that calibrates and verifies gaze correction, measuring
    whether it actually works rather than taking the vendor's word for it.
-9. NSU Result Checker, looks up an NSU undergraduate admission result from a test
-   pass number so applicants do not have to sit refreshing a portal.
-10. StudyBuddy, an AI study companion. Drop a PDF or paste notes to get instant
+9. StudyBuddy, an AI study companion. Drop a PDF or paste notes to get instant
    summaries, grounded Q&A, and auto-generated interactive quizzes. Live at
    studybuddy-ai-pi.vercel.app.
-11. Doomsday Tracker, a cinematic watch-tracker with accounts, cloud-synced
+10. Doomsday Tracker, a cinematic watch-tracker with accounts, cloud-synced
    progress, a private friends-and-family leaderboard, live stats charts, and an
    interactive animated UI. Live at doomsday-tracker-erfanul.vercel.app.
-12. Cineplex Automation Platform, a Telegram bot plus a public web app that
+11. Cineplex Automation Platform, a Telegram bot plus a public web app that
    track cinema seat availability in real time, render seat maps, and can book
    tickets automatically the moment they go on sale. Stack: Python, Playwright.
-13. Result Watchers, bots that watch university admission pages and a logged-in
+12. Result Watchers, bots that watch university admission pages and a logged-in
    applicant portal, and alert by email/iMessage the moment results publish. Run
    free on GitHub Actions.
 
