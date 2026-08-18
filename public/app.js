@@ -165,6 +165,7 @@ $('#mrow2').innerHTML = rowHTML(false).repeat(2);
 
 /* ============ CAROUSEL (coverflow + dots + swipe) ============ */
 const projects = [
+  { name: 'Lens', download: 'https://github.com/erfanulfarhan/lens/releases', repo: 'https://github.com/erfanulfarhan/lens', desc: 'A desktop AI assistant that reads your screen and follows your calls, answering from your own documents. The model runs on your machine, so there is no subscription and nothing leaves your computer.', tags: ['Electron', 'Local LLM', 'Swift', 'RAG'] },
   { name: 'Friday', live: 'https://friday-erfanul.vercel.app', repo: 'https://github.com/erfanulfarhan/friday-voice', b: 1, desc: 'A voice-first AI assistant you talk to and it talks back. Audio-reactive orb, real-time speech recognition and synthesis, powered by GPT OSS 120B.', tags: ['React', 'Whisper STT', 'Motion', 'Groq'] },
   { name: 'SiteSage', live: 'https://sitesage-erfanul.vercel.app', repo: 'https://github.com/erfanulfarhan/sitesage', b: 1, desc: 'An embeddable AI chat widget for any website: create a bot, train it on text or web pages, drop it in with one line of code. Multi-tenant.', tags: ['Multi-tenant', 'Widget', 'Postgres FTS', 'Groq'] },
   { name: 'Ask My Docs', live: 'https://ask-my-docs-erfanul.vercel.app', repo: 'https://github.com/erfanulfarhan/ask-my-docs', b: 1, desc: 'A RAG knowledge base that answers with citations to the exact source passage. Semantic vector search; embeddings run in the browser.', tags: ['RAG', 'pgvector', 'Embeddings', 'Groq'] },
@@ -181,7 +182,7 @@ track.innerHTML = projects.map((p, i) => `
       ${p.b ? '<span class="live"><span class="dot"></span>Live</span>' : ''}
       <h3>${p.name}</h3><p>${p.desc}</p>
       <div class="tags">${p.tags.map((t) => `<span class="tag">${t}</span>`).join('')}</div>
-      <div class="plinks">${p.live ? `<a href="${p.live}" target="_blank" rel="noopener">↗ Live</a>` : ''}${p.repo ? `<a href="${p.repo}" target="_blank" rel="noopener">⌥ Code</a>` : ''}</div>
+      <div class="plinks">${p.live ? `<a href="${p.live}" target="_blank" rel="noopener">↗ Live</a>` : ''}${p.download ? `<a href="${p.download}" target="_blank" rel="noopener">↓ Download</a>` : ''}${p.repo ? `<a href="${p.repo}" target="_blank" rel="noopener">⌥ Code</a>` : ''}</div>
     </div>
   </article>`).join('');
 const cards = $$('.pcard');

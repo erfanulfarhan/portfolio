@@ -26,28 +26,36 @@ SKILLS
 - Bots & messaging: Telegram bots, email/iMessage notifications, TTS/STT voice.
 
 PROJECTS
-1. Friday, a voice-first AI assistant you talk to and it talks back. Audio-reactive
+1. Lens, a desktop AI assistant for macOS and Windows that reads your screen and
+   follows your calls, answering from documents you give it. The model runs on your
+   own machine through Ollama, so it is free to use and nothing leaves your
+   computer; it also works with an Anthropic, Gemini, OpenAI or Groq key if you own
+   one. Retrieval over your own PDFs and notes, on-device transcription via a Swift
+   helper, chat history, and a model recommendation based on your hardware. Stack:
+   Electron, React, TypeScript, Swift. Download from
+   github.com/erfanulfarhan/lens/releases.
+2. Friday, a voice-first AI assistant you talk to and it talks back. Audio-reactive
    orb, speech-to-text via Groq Whisper and browser speech synthesis, a Motion-animated
    UI, and a Groq (GPT OSS 120B) brain. Built with React + Tailwind + shadcn/ui.
    Live at friday-erfanul.vercel.app.
-2. SiteSage, an embeddable AI chat widget for ANY website. Create a bot in a
+3. SiteSage, an embeddable AI chat widget for ANY website. Create a bot in a
    dashboard, train it on pasted text or web pages, and drop it in with one line
    of code. Multi-tenant; retrieval via Postgres full-text search; answers by
    Groq. Live at sitesage-erfanul.vercel.app.
-3. Ask My Docs, a retrieval-augmented (RAG) knowledge base. Upload a PDF or
+4. Ask My Docs, a retrieval-augmented (RAG) knowledge base. Upload a PDF or
    paste notes, then ask questions and get answers WITH citations to the exact
    source passage. Semantic vector search with Supabase pgvector; embeddings run
    in the browser. Live at ask-my-docs-erfanul.vercel.app.
-4. StudyBuddy, an AI study companion. Drop a PDF or paste notes to get instant
+5. StudyBuddy, an AI study companion. Drop a PDF or paste notes to get instant
    summaries, grounded Q&A, and auto-generated interactive quizzes. Live at
    studybuddy-ai-pi.vercel.app.
-5. Doomsday Tracker, a cinematic watch-tracker with accounts, cloud-synced
+6. Doomsday Tracker, a cinematic watch-tracker with accounts, cloud-synced
    progress, a private friends-and-family leaderboard, live stats charts, and an
    interactive animated UI. Live at doomsday-tracker-erfanul.vercel.app.
-6. Cineplex Automation Platform, a Telegram bot plus a public web app that
+7. Cineplex Automation Platform, a Telegram bot plus a public web app that
    track cinema seat availability in real time, render seat maps, and can book
    tickets automatically the moment they go on sale. Stack: Python, Playwright.
-7. Result Watchers, bots that watch university admission pages and a logged-in
+8. Result Watchers, bots that watch university admission pages and a logged-in
    applicant portal, and alert by email/iMessage the moment results publish. Run
    free on GitHub Actions.
 
