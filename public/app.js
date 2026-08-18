@@ -228,31 +228,77 @@ addEventListener('resize', () => { clearTimeout(rzT); rzT = setTimeout(computeSt
 computeStops();
 addEventListener('load', () => setTimeout(computeStops, 300));
 // desktop: soft pointer glow on hover (kept flat, no 3D tilt, so orientation can't get stuck)
-if (finePointer) cards.forEach((card) => {
-  const inn = card.querySelector('.pcard__in');
-  card.addEventListener('mousemove', (e) => { const r = card.getBoundingClientRect(); inn.style.setProperty('--mx', (e.clientX - r.left) + 'px'); inn.style.setProperty('--my', (e.clientY - r.top) + 'px'); });
-});
+// The glow is a 520px radial gradient, so moving it repaints a large area.
+// Pointer events fire far faster than the screen refreshes; coalescing to one
+// write per frame keeps that repaint to at most once per frame.
+if (finePointer) {
+  let glowRaf = 0, glowTarget = null, glowX = 0, glowY = 0;
+  const paintGlow = () => {
+    glowRaf = 0;
+    if (!glowTarget) return;
+    glowTarget.style.setProperty('--mx', glowX + 'px');
+    glowTarget.style.setProperty('--my', glowY + 'px');
+  };
+  cards.forEach((card) => {
+    const inn = card.querySelector('.pcard__in');
+    card.addEventListener('mousemove', (e) => {
+      const r = card.getBoundingClientRect();
+      glowTarget = inn; glowX = e.clientX - r.left; glowY = e.clientY - r.top;
+      if (!glowRaf) glowRaf = requestAnimationFrame(paintGlow);
+    }, { passive: true });
+  });
+}
 // mouse drag to slide the whole works track (touch keeps native scroll).
 // 'grabbing' is only added once an actual drag starts, so plain clicks still hit
 // the card links (Live / Code) normally. Adds a pickup "pinch" + release momentum
 // so the drag feels physical.
 let down = false, dragged = false, sx = 0, sl = 0, vel = 0, fling = 0;
+// The drag keeps its own idea of where the track should be. Reading scrollLeft
+// straight after writing it forces the browser to lay out synchronously, and at
+// pointer-event rates that was the whole source of the stutter.
+let targetSL = 0, pendingX = 0, dragRaf = 0;
+
+const applyDrag = () => {
+  dragRaf = 0;
+  if (!down) return;
+  const dx = pendingX - sx;
+  if (!dragged && Math.abs(dx) > 5) { dragged = true; track.classList.add('grabbing'); }
+  if (!dragged) return;
+  const next = sl - dx;
+  vel = next - targetSL;          // px moved since the last frame, no layout read
+  targetSL = next;
+  track.scrollLeft = next;
+};
+
 track.addEventListener('pointerdown', (e) => {
   if (e.pointerType !== 'mouse') return;
-  down = true; dragged = false; sx = e.clientX; sl = track.scrollLeft; vel = 0;
+  down = true; dragged = false; sx = e.clientX; vel = 0;
+  sl = targetSL = track.scrollLeft;
   cancelAnimationFrame(fling);
 });
 addEventListener('pointermove', (e) => {
   if (!down) return;
-  const dx = e.clientX - sx;
-  if (!dragged && Math.abs(dx) > 5) { dragged = true; track.classList.add('grabbing'); }
-  if (dragged) { const target = sl - dx; vel = target - track.scrollLeft; track.scrollLeft = target; }  // vel = px moved this frame
-});
+  pendingX = e.clientX;                                   // one apply per frame
+  if (!dragRaf) dragRaf = requestAnimationFrame(applyDrag);
+}, { passive: true });
+
 const endDrag = () => {
   if (!down) return;
   down = false; track.classList.remove('grabbing');
-  if (dragged && Math.abs(vel) > 0.5) {                       // flick → keep gliding with decay
-    (function glide() { track.scrollLeft += vel; vel *= 0.93; if (Math.abs(vel) > 0.4) fling = requestAnimationFrame(glide); })();
+  cancelAnimationFrame(dragRaf); dragRaf = 0;
+  if (dragged && Math.abs(vel) > 0.5) {
+    // Decay by elapsed time, not by frame: a fixed factor per frame glides
+    // twice as far on a 60Hz screen as on a 120Hz one.
+    let last = performance.now();
+    const glide = (now) => {
+      const frames = Math.min(3, (now - last) / 16.667);
+      last = now;
+      targetSL += vel * frames;
+      track.scrollLeft = targetSL;
+      vel *= Math.pow(0.93, frames);
+      if (Math.abs(vel) > 0.4) fling = requestAnimationFrame(glide);
+    };
+    fling = requestAnimationFrame(glide);
   }
 };
 addEventListener('pointerup', endDrag); addEventListener('pointercancel', endDrag);

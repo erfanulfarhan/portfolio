@@ -114,9 +114,9 @@
     user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
   .track.grabbing{cursor:grabbing}
   .track.grabbing .pcard{pointer-events:none}
-  .track.grabbing .pcard__in{transform:scale(.965);transition:transform .18s ease}  /* pickup "pinch" while dragging */
+  .track.grabbing .pcard__in{transform:scale(.965);transition:transform .18s ease;will-change:transform}  /* pickup "pinch" while dragging */
   .track::-webkit-scrollbar{display:none}
-  .pcard{scroll-snap-align:start;flex:0 0 clamp(280px,80vw,420px);position:relative}
+  .pcard{scroll-snap-align:start;flex:0 0 clamp(280px,80vw,420px);position:relative;contain:layout paint}
   .pcard__in{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:1.7rem;position:relative;overflow:hidden;
     min-height:340px;display:flex;flex-direction:column;transition:transform .3s cubic-bezier(.2,.7,.2,1),box-shadow .3s,border-color .3s}
   .pcard__in::before{content:"";position:absolute;inset:0;opacity:0;transition:.3s;pointer-events:none;background:radial-gradient(520px circle at var(--mx,50%) var(--my,30%),rgba(212,175,55,.20),transparent 45%)}
