@@ -4,7 +4,7 @@ A dark, animated personal portfolio for an **AI &amp; Automation Developer**, wi
 **Gemini-powered "ask about my work" chat** that answers visitors' questions
 about my projects and skills.
 
-**Live: https://erfanulfarhan.vercel.app**
+**Live: https://erfanul.me**
 
 ## Highlights
 - Animated hero (aurora blurs, grid, typewriter tagline), scroll-reveal, count-up
