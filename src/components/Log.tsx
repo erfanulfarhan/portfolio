@@ -8,6 +8,11 @@ type Graph = { height: number; nodes: number[] };
 // video thumbnail) is shown whole inside it rather than cropped.
 const fills = (w: number, h: number) => Math.abs(w / h - 1.5) < 0.1;
 
+// A domain in a title (deltaspeed.erfanul.me) may wrap after its dots, so a
+// narrow column breaks it there instead of letting it run into the thumbnail.
+const breakAfterDots = (text: string) =>
+  text.split(/(?<=\.)(?=[a-z])/i).flatMap((part, i) => (i ? [<wbr key={i} />, part] : [part]));
+
 /**
  * The mission log: releases newest first, threaded on a git graph that draws
  * itself as you scroll. On wide screens a preview beside the list shows the
@@ -140,7 +145,7 @@ export function Log() {
               <div className="entry__body">
                 <h3 className="entry__title">
                   <a href={r.href} target="_blank" rel="noopener noreferrer">
-                    {r.title}
+                    {breakAfterDots(r.title)}
                   </a>
                 </h3>
                 <p className="entry__meta">

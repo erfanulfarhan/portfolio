@@ -21,7 +21,9 @@
   /* The accent for whatever ground an element sits on. */
   --accent: var(--amber);
 
-  --font-sans: 'Bricolage Grotesque Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /* The EHF mark keeps its own heavy, tightly set face: a logo, not text. */
+  --font-brand: 'Bricolage Grotesque Variable', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, monospace;
 
   --gutter: clamp(1.25rem, 5vw, 4.5rem);
@@ -223,6 +225,7 @@
   .boot__mark {
     position: relative;
     margin: 0;
+    font-family: var(--font-brand);
     font-size: clamp(5rem, 15vw, 9.5rem);
     font-weight: 800;
     line-height: 1;
@@ -407,6 +410,7 @@
     position: relative;
     display: inline-flex;
     align-items: baseline;
+    font-family: var(--font-brand);
     font-size: 1.45rem;
     font-weight: 800;
     letter-spacing: -0.05em;
@@ -580,8 +584,7 @@
     padding: 0.85rem 1rem;
     border-radius: 0.9rem;
     font-size: 1.35rem;
-    font-weight: 700;
-    letter-spacing: -0.03em;
+    font-weight: 600;
   }
   .hud__sheet-link[aria-current='true'] {
     color: var(--accent);
@@ -777,10 +780,10 @@
   }
   .hero__name {
     margin: 0.9rem 0 0;
-    font-size: clamp(3.3rem, 13.5vw, 9rem);
-    font-weight: 800;
+    font-size: clamp(2.75rem, 13.5vw, 9rem);
+    font-weight: 600;
     line-height: 0.9;
-    letter-spacing: -0.055em;
+    letter-spacing: -0.01em;
     color: var(--light);
   }
   .hero__line {
@@ -788,23 +791,23 @@
     white-space: nowrap;
   }
   /* The dot on the i is a small amber star. The letter's own dot is clipped
-     off (it sits 0.06em to 0.21em down; the stem starts below 0.24em), and the
-     star is drawn where it was: 0.116em across and 0.137em down. */
+     off (it sits 0.08em to 0.22em down; the stem starts below 0.29em), and the
+     star is drawn where it was: 0.115em across and 0.149em down. */
   .hero__i {
     position: relative;
     display: inline-block;
   }
   .hero__i > span {
     display: inline-block;
-    clip-path: inset(0.24em -0.2em -0.2em -0.2em);
+    clip-path: inset(0.255em -0.2em -0.2em -0.2em);
   }
   .hero__i::after {
     content: '';
     position: absolute;
-    left: 0.116em;
-    top: 0.137em;
-    width: 0.165em;
-    height: 0.165em;
+    left: 0.115em;
+    top: 0.149em;
+    width: 0.158em;
+    height: 0.158em;
     border-radius: 50%;
     background: radial-gradient(circle, #fff3dc 0 30%, var(--amber) 62%);
     box-shadow:
@@ -843,7 +846,7 @@
   @media (min-width: 900px) and (min-aspect-ratio: 21/20) {
     .hero__copy {
       justify-content: center;
-      max-width: min(62rem, 60vw);
+      max-width: min(65rem, 60vw);
       padding-top: 0;
     }
     .hero__name {
@@ -918,9 +921,9 @@
   .reel__title {
     margin: 1rem 0 0;
     font-size: clamp(2.4rem, 4.4vw, 4.6rem);
-    font-weight: 800;
+    font-weight: 600;
     line-height: 0.98;
-    letter-spacing: -0.05em;
+    letter-spacing: -0.01em;
     text-wrap: balance;
   }
   .reel__hint {
@@ -932,6 +935,7 @@
   .frame {
     flex: none;
     width: min(60vw, 62rem, calc((100svh - 17rem) * 1.5));
+    container-type: inline-size;
     --focus: 1;
   }
   .frame__shot {
@@ -985,15 +989,28 @@
   .frame__name {
     margin: 0;
     font-size: clamp(1.6rem, 2.6vw, 2.5rem);
-    font-weight: 700;
+    font-weight: 600;
     line-height: 1.05;
-    letter-spacing: -0.04em;
   }
   .frame__line {
     margin: 0.35rem 0 0;
     max-width: 38rem;
     color: rgba(236, 231, 221, 0.72);
     font-size: 1rem;
+  }
+  /* A frame too narrow for two columns (a phone held sideways): the number
+     and status sit in a row above the name instead of beside it. */
+  @container (max-width: 16rem) {
+    .frame__caption {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .frame__meta {
+      grid-row: auto;
+      grid-auto-flow: column;
+      justify-content: start;
+      column-gap: 1rem;
+      margin-bottom: 0.45rem;
+    }
   }
   .reel__end {
     flex: none;
@@ -1005,9 +1022,8 @@
   .reel__end-title {
     margin: 0;
     font-size: clamp(1.8rem, 2.8vw, 2.8rem);
-    font-weight: 700;
+    font-weight: 600;
     line-height: 1.02;
-    letter-spacing: -0.045em;
   }
   .reel__bar {
     position: absolute;
@@ -1085,9 +1101,9 @@
   .roll__title {
     margin: 1rem 0 0;
     font-size: clamp(2.2rem, 4.4vw, 4.2rem);
-    font-weight: 800;
+    font-weight: 600;
     line-height: 1;
-    letter-spacing: -0.05em;
+    letter-spacing: -0.01em;
     text-wrap: balance;
   }
   .roll__grid {
@@ -1110,6 +1126,7 @@
     text-align: left;
     cursor: pointer;
     color: var(--light);
+    container-type: inline-size;
   }
   .tile__frame {
     position: relative;
@@ -1143,9 +1160,8 @@
     align-items: flex-end;
     padding: 1rem;
     font-size: clamp(1.3rem, 2vw, 1.75rem);
-    font-weight: 800;
+    font-weight: 600;
     line-height: 0.95;
-    letter-spacing: -0.045em;
     color: rgba(236, 231, 221, 0.85);
     background:
       radial-gradient(circle, rgba(143, 150, 163, 0.16) 1px, transparent 1.5px) 0 0 / 14px 14px,
@@ -1187,8 +1203,7 @@
   .tile__name {
     grid-row: 2;
     font-size: 1.05rem;
-    font-weight: 700;
-    letter-spacing: -0.02em;
+    font-weight: 600;
     line-height: 1.2;
     transition: color 0.25s;
   }
@@ -1199,6 +1214,19 @@
     grid-column: 1 / -1;
     font-size: 0.8125rem;
     color: var(--haze);
+  }
+  /* In a narrow tile the number drops down beside the kind, so a long word in
+     the name (Automation) gets the whole width. */
+  @container (max-width: 10.5rem) {
+    .tile__name {
+      grid-column: 1 / -1;
+    }
+    .tile__no {
+      grid-row: 3;
+    }
+    .tile__kind {
+      grid-column: 1;
+    }
   }
   @media (max-width: 1100px) {
     .roll__grid {
@@ -1319,9 +1347,9 @@
   }
   .project__card-name {
     font-size: clamp(2.2rem, 5vw, 4rem);
-    font-weight: 800;
+    font-weight: 600;
     line-height: 0.95;
-    letter-spacing: -0.05em;
+    letter-spacing: -0.01em;
     color: var(--light);
   }
   .project__card-dot {
@@ -1340,9 +1368,9 @@
   .project__title {
     margin: 0;
     font-size: clamp(2rem, 3.4vw, 3rem);
-    font-weight: 800;
+    font-weight: 600;
     line-height: 1;
-    letter-spacing: -0.05em;
+    letter-spacing: -0.01em;
   }
   .project__desc {
     margin: 1.1rem 0 0;
@@ -1673,7 +1701,7 @@
   }
   .tk-head {
     color: #f6a453;
-    font-weight: 700;
+    font-weight: 600;
   }
   /* Typing: each line is uncovered one character at a time. The font is
      monospaced, so one step of the clip is exactly one character. */
@@ -1852,9 +1880,9 @@
   .modes__title {
     margin: 0.9rem 0 0;
     font-size: clamp(2.4rem, 4.6vw, 4.6rem);
-    font-weight: 800;
+    font-weight: 600;
     line-height: 1;
-    letter-spacing: -0.05em;
+    letter-spacing: -0.01em;
   }
   .dial {
     grid-area: dial;
@@ -1956,9 +1984,8 @@
   .mode__title {
     margin: 1rem 0 0;
     font-size: clamp(1.6rem, 2.6vw, 2.4rem);
-    font-weight: 700;
+    font-weight: 600;
     line-height: 1.08;
-    letter-spacing: -0.04em;
   }
   .mode__line {
     max-width: 28rem;
@@ -2035,9 +2062,9 @@
   .log__title {
     margin: 1rem 0 0;
     font-size: clamp(2.4rem, 4.6vw, 4.6rem);
-    font-weight: 800;
+    font-weight: 600;
     line-height: 1;
-    letter-spacing: -0.05em;
+    letter-spacing: -0.01em;
   }
   .log__sub {
     margin: 1rem 0 0;
@@ -2114,9 +2141,9 @@
   .entry__title {
     margin: 0;
     font-size: clamp(1.2rem, 2.1vw, 1.55rem);
-    font-weight: 700;
+    font-weight: 600;
     line-height: 1.25;
-    letter-spacing: -0.03em;
+    overflow-wrap: break-word;
   }
   .entry__title a {
     transition: color 0.25s;
@@ -2233,9 +2260,9 @@
   .contact__title {
     margin: 1rem 0 0;
     font-size: clamp(3rem, 6.8vw, 6.6rem);
-    font-weight: 800;
+    font-weight: 600;
     line-height: 0.95;
-    letter-spacing: -0.055em;
+    letter-spacing: -0.01em;
   }
   .contact__title span {
     display: block;
@@ -2365,7 +2392,7 @@
     border: 0;
     background: none;
     font-size: 0.9375rem;
-    font-weight: 700;
+    font-weight: 600;
     color: var(--ink);
     cursor: pointer;
   }
@@ -2428,6 +2455,7 @@
     margin: 0 0 1rem -0.04em;
     padding-right: 0.2em;
     font-size: clamp(6rem, 24vw, 21rem);
+    font-family: var(--font-brand);
     font-weight: 800;
     line-height: 0.78;
     /* Tight enough that H and F overlap a little: touching edges would leave a hairline seam in the glow. */
@@ -2477,8 +2505,7 @@
   }
   .footer__name {
     margin: 0;
-    font-weight: 700;
-    letter-spacing: -0.02em;
+    font-weight: 600;
   }
   .footer__links {
     display: flex;
@@ -2619,7 +2646,7 @@
   .chat__title {
     margin: 0;
     font-size: 1rem;
-    font-weight: 700;
+    font-weight: 600;
   }
   .chat__sub {
     margin: 0.15rem 0 0;
