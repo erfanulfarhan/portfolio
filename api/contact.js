@@ -14,9 +14,10 @@ export default async function handler(req, res) {
 
   let body = req.body;
   if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
-  const { name = '', email = '', message = '', company = '' } = body || {};
+  const { name = '', email = '', message = '', hp = '', company = '' } = body || {};
 
-  if (company) return res.status(200).json({ ok: true });          // honeypot: bots fill this → silently drop
+  // Honeypot: a hidden field only bots fill in. `company` is the old site's name for it.
+  if (hp || company) return res.status(200).json({ ok: true });
   if (!name.trim() || !email.trim() || !message.trim()) return res.status(400).json({ error: 'All fields are required.' });
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return res.status(400).json({ error: 'Please enter a valid email.' });
   if (message.length > 5000) return res.status(400).json({ error: 'Message is too long.' });

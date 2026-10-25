@@ -18,11 +18,13 @@ ABOUT
   systems that watch, alert, and act. Available for freelance work.
 
 SKILLS
-- Languages: Python, JavaScript.
+- Languages: Python, JavaScript, TypeScript, Swift.
 - AI / LLMs: Google Gemini, OpenAI, Anthropic, Groq, building assistants,
   RAG-style Q&A, and content generation into real products.
 - Automation: Playwright browser automation, scheduled jobs, web scraping.
-- Web: serverless (Vercel), aiohttp, REST APIs, HTML/CSS/JS front-ends.
+- Web: React, Next.js, serverless (Vercel, Cloudflare Workers), aiohttp, REST
+  APIs, Supabase and Appwrite back ends.
+- Desktop: Electron apps for macOS and Windows, native macOS helpers.
 - Bots & messaging: Telegram bots, email/iMessage notifications, TTS/STT voice.
 
 PROJECTS
@@ -31,20 +33,19 @@ PROJECTS
    traffic that crosses the ISP's international capacity. speedtest.net shows the
    first, speedtest.sg the second, and neither shows the gap. Delta measures both
    and reports the ratio. The measurement engine runs in a Web Worker so the
-   animation cannot slow the numbers down; endpoints cryptographically sign the
-   bytes they served so results can be verified. Local runs on a Cloudflare Worker
-   at the Dhaka PoP; international servers run on Vercel pinned to Singapore,
-   Mumbai and Tokyo, each verified at deploy time to actually execute in its
-   region. Stack: React, TypeScript, Cloudflare Workers, Vercel. Live at
-   deltaspeed.pages.dev.
+   animation cannot slow the numbers down. The local test runs on a Cloudflare
+   Worker at the Dhaka PoP; since 22 Oct 2026 the international test runs on open
+   M-Lab servers in Singapore, Mumbai and Tokyo. Stack: React, TypeScript,
+   Cloudflare Workers. Live at deltaspeed.erfanul.me.
 2. Lens, a desktop AI assistant for macOS and Windows that reads your screen and
    follows your calls, answering from documents you give it. The model runs on your
    own machine through Ollama, so it is free to use and nothing leaves your
    computer; it also works with an Anthropic, Gemini, OpenAI or Groq key if you own
    one. Retrieval over your own PDFs and notes, on-device transcription via a Swift
    helper, chat history, and a model recommendation based on your hardware. Stack:
-   Electron, React, TypeScript, Swift. Download from
-   github.com/erfanulfarhan/lens/releases.
+   Electron, React, TypeScript, Swift. Website: getlens.pages.dev. Download from
+   github.com/erfanulfarhan/lens/releases (six releases, 0.1.0 to 0.1.5, between
+   18 and 21 Aug 2026).
 3. Friday, a voice-first AI assistant you talk to and it talks back. Audio-reactive
    orb, speech-to-text via Groq Whisper and browser speech synthesis, a Motion-animated
    UI, and a Groq (GPT OSS 120B) brain. Built with React + Tailwind + shadcn/ui.
@@ -60,7 +61,7 @@ PROJECTS
 6. Slate, a file store with passwordless email sign-in. Drag and drop upload,
    browse by type, share by email, search and sort. Download links are minted per
    request and expire, so a shared URL stops working instead of living forever.
-   Stack: TypeScript, Next.js, Appwrite. Live at store-it-c-e113.vercel.app.
+   Stack: TypeScript, Next.js, Appwrite. Live at store-it-psi-three.vercel.app.
 7. Exam Toolkit, free revision tools for Edexcel International A Level and IGCSE.
    A UMS grade calculator built from every published grade boundary, past papers
    beside mark schemes that stay locked until you attempt the question, a mock
@@ -81,6 +82,14 @@ PROJECTS
 13. Result Watchers, bots that watch university admission pages and a logged-in
    applicant portal, and alert by email/iMessage the moment results publish. Run
    free on GitHub Actions.
+14. Gaming Mode, a one-click Mac app that frees memory before you play: it closes
+   the apps you do not need, saves your browser tabs and opens a lean browser for
+   your game; click again and everything comes back. Open source (MIT), version
+   1.0.0 released 9 Oct 2026 at github.com/erfanulfarhan/gaming-mode.
+15. DrJava for Mac, DrJava with Java 8 built in: a one-click download that is sharp
+   on Retina, so students can compile and run Java right away. Build 2 released
+   16 Oct 2026 at github.com/erfanulfarhan/drjava-mac, with a two-minute install
+   video on YouTube.
 
 CONTACT: via the Contact section / GitHub github.com/erfanulfarhan.
 `;
@@ -92,15 +101,27 @@ async function callGroq(key, message, history) {
   }
   messages.push({ role: "user", content: message });
 
+  // GPT OSS reasons before it answers, and the reasoning counts against max_tokens.
+  // Low effort plus a roomier limit keeps a short answer from being cut to nothing.
+  // If Groq ever rejects reasoning_effort, the request is retried without it.
+  let reasoning = true;
   for (let attempt = 0; attempt < 3; attempt++) {
+    const payload = { model: MODEL, messages, temperature: 0.6, max_tokens: 1500 };
+    if (reasoning) payload.reasoning_effort = "low";
     const r = await fetch(ENDPOINT, {
       method: "POST",
       headers: { authorization: `Bearer ${key}`, "content-type": "application/json" },
-      body: JSON.stringify({ model: MODEL, messages, temperature: 0.6, max_tokens: 600 }),
+      body: JSON.stringify(payload),
     });
     const data = await r.json().catch(() => ({}));
-    if (r.ok) return data?.choices?.[0]?.message?.content ?? "";
+    if (r.ok) {
+      const text = (data?.choices?.[0]?.message?.content ?? "").trim();
+      if (text) return text;
+      if (attempt < 2) continue; // an empty answer is usually a one-off
+      throw new Error("The assistant came back without an answer. Ask again.");
+    }
     const msg = data?.error?.message || `HTTP ${r.status}`;
+    if (r.status === 400 && reasoning && /reasoning/i.test(msg)) { reasoning = false; continue; }
     const transient = r.status === 429 || r.status === 503 || /overload|high demand|try again/i.test(msg);
     if (transient && attempt < 2) { await new Promise((s) => setTimeout(s, 2000 * (attempt + 1))); continue; }
     throw new Error(msg);
@@ -119,11 +140,12 @@ export default async function handler(req, res) {
   if (!message.trim()) return res.status(400).json({ error: "Ask me something." });
 
   try {
-    return res.status(200).json({ text: (await callGroq(key, message, history)).trim() });
+    return res.status(200).json({ text: await callGroq(key, message, history) });
   } catch (e) {
     const rl = /quota|rate|429|overload|busy/i.test(String(e.message));
+    const empty = /without an answer/.test(String(e.message));
     return res.status(rl ? 429 : 502).json({
-      error: rl ? "I'm a bit busy right now, try again in a few seconds." : `Error: ${e.message}`,
+      error: rl ? "I'm a bit busy right now, try again in a few seconds." : empty ? e.message : `Error: ${e.message}`,
     });
   }
 }

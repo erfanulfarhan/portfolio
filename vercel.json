@@ -1,14 +1,16 @@
 {
-  "version": 2,
-  "builds": [
-    { "src": "api/*.js", "use": "@vercel/node" },
-    { "src": "public/**", "use": "@vercel/static" }
-  ],
-  "routes": [
-    { "src": "/api/chat", "dest": "/api/chat.js" },
-    { "src": "/api/contact", "dest": "/api/contact.js" },
-    { "src": "/", "headers": { "cache-control": "public, max-age=0, must-revalidate" }, "dest": "/public/index.html" },
-    { "src": "/app.js", "headers": { "cache-control": "public, max-age=0, must-revalidate" }, "dest": "/public/app.js" },
-    { "src": "/(.*)", "dest": "/public/$1" }
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "vite",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "headers": [
+    {
+      "source": "/assets/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+    },
+    {
+      "source": "/work/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=604800" }]
+    }
   ]
 }
