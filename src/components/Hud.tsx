@@ -21,7 +21,6 @@ export function Hud() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [sound, setSound] = useState(() => ({ on: soundtrack.isWanted, playing: soundtrack.isPlaying }));
-  const soundRef = useRef<HTMLButtonElement>(null);
   const frameRef = useRef<HTMLDivElement>(null);
   const timeRef = useRef<HTMLSpanElement>(null);
   const navRef = useRef<HTMLElement>(null);
@@ -118,7 +117,7 @@ export function Hud() {
   // The switch shows whether it is wanted, and its bars move while it plays.
   useEffect(() => {
     const off = soundtrack.subscribe(() => setSound({ on: soundtrack.isWanted, playing: soundtrack.isPlaying }));
-    soundtrack.arm(soundRef.current);
+    soundtrack.arm();
     return off;
   }, []);
 
@@ -161,9 +160,9 @@ export function Hud() {
           <div className="hud__end">
             <ul className="hud__links">{links('hud__link')}</ul>
             <button
-              ref={soundRef}
               type="button"
               className="sound"
+              data-sound-control
               aria-pressed={sound.on}
               data-playing={sound.playing}
               title={

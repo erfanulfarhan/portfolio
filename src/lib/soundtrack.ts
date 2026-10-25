@@ -87,6 +87,8 @@ function saveWanted(on: boolean) {
 // The inputs every browser accepts as the visitor's go-ahead for sound.
 const GO_AHEAD = ['pointerdown', 'pointerup', 'keydown', 'touchend'] as const;
 
+const savingData = () => Boolean((navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData);
+
 class Soundtrack {
   private ctx: AudioContext | null = null;
   private master: GainNode | null = null;
@@ -102,7 +104,6 @@ class Soundtrack {
   private playing = false;
   private wanted = readWanted();
   private waiting = false;
-  private except: Element | null = null;
   private audio: HTMLAudioElement | null = null;
   private readonly listeners = new Set<() => void>();
 
@@ -147,19 +148,38 @@ class Soundtrack {
   }
 
   /**
-   * On by default. Browsers allow sound only after the visitor's first click,
-   * tap or key press, so the music starts on that, or at once if this page
-   * may already play sound. A visitor who turned it off stays off, and one
-   * whose browser is saving data is not started for them. `except` is the
-   * Sound switch, which handles its own clicks.
+   * Whether the intro should ask the visitor in: music is wanted, but this
+   * page may not make a sound until they click, tap or press a key.
    */
-  arm(except: Element | null) {
-    this.except = except;
-    const saving = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData;
-    if (!this.wanted || this.playing || saving) return;
-    const activation = (navigator as Navigator & { userActivation?: { hasBeenActive: boolean } }).userActivation;
-    if (activation?.hasBeenActive) this.start();
-    else this.listen();
+  get needsGoAhead() {
+    return this.wanted && !this.playing && !savingData();
+  }
+
+  /**
+   * On by default. Browsers allow sound only after the visitor's first click,
+   * tap or key press, so the music starts on that. A visitor who turned it
+   * off stays off, and one whose browser is saving data is not started for them.
+   */
+  arm() {
+    if (!this.wanted || this.playing || savingData()) return;
+    this.listen();
+  }
+
+  /** The intro's "Enter with sound". Call it inside the click: that is what lets sound start. */
+  enterWithSound() {
+    this.unlisten();
+    this.wanted = true;
+    saveWanted(true);
+    this.start();
+    this.emit();
+  }
+
+  /** The intro's "Without sound": off now, and remembered for later visits. */
+  enterQuietly() {
+    this.unlisten();
+    this.wanted = false;
+    saveWanted(false);
+    this.emit();
   }
 
   /** The Sound switch: silences the music if it is playing, otherwise starts it now. */
@@ -185,7 +205,8 @@ class Soundtrack {
   }
 
   private goAhead = (e: Event) => {
-    if (this.except && e.target instanceof Node && this.except.contains(e.target)) return;
+    // The Sound switch and the intro's buttons decide for themselves.
+    if (e.target instanceof Element && e.target.closest('[data-sound-control]')) return;
     if (e instanceof KeyboardEvent && e.key === 'Escape') return;
     this.unlisten();
     if (this.wanted && !this.playing) this.start();
