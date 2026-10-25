@@ -26,6 +26,15 @@ const float FAR = 14.0;
 const float EXIT = 13.0;
 // Rays aimed closer than this to the hole fall in: the edge of the shadow.
 const float B_EDGE = 2.598;
+// Rays aimed just outside the edge wind round the hole before they leave, and
+// what they then meet comes in images finer than any pixel. Within this much
+// of the edge (in aim) that light is drawn as the smooth ring it adds up to.
+const float WOUND = 0.08;
+// The ring's fine line and its soft glow, as angles on screen (radians), so it
+// keeps its look as the camera falls in. A line thinner than a pixel and a bit
+// is widened to that, and dimmed to match.
+const float RING_LINE = 0.001;
+const float RING_GLOW = 0.0082;
 // The page's own space colour, in sRGB, so the canvas edge disappears into it.
 const vec3 SPACE = vec3(0.0196, 0.0275, 0.0431);
 
@@ -206,19 +215,30 @@ void main() {
   float h2 = dot(hv, hv);
   // How fast that changes from pixel to pixel, taken before any branching.
   float aim = sqrt(h2);
-  float aimStep = fwidth(aim);
+  float aimStep = max(fwidth(aim), 1e-4);
+
+  // A ray heading in falls if its aim is inside the shadow's edge: B_EDGE
+  // seen from far off, a little less from close in, where it starts deeper in
+  // the well. Measured from the aim rather than from where each traced ray
+  // ended up, the edge is exact and anti-aliased over a pixel either side.
+  // Just outside it the light winds round the hole (`wound`), and is drawn as
+  // the ring below. A ray heading out from the start always escapes.
+  bool inbound = dot(uCamPos, ray) < 0.0;
+  float r0 = length(uCamPos);
+  float edgeAim = inversesqrt(1.0 / (B_EDGE * B_EDGE) + 1.0 / (r0 * r0 * r0));
+  float open = inbound ? smoothstep(edgeAim - aimStep, edgeAim + aimStep, aim) : 1.0;
+  float wound = inbound ? 1.0 - smoothstep(edgeAim, edgeAim + max(WOUND, 4.0 * aimStep), aim) : 0.0;
 
   vec3 light = vec3(0.0);
   vec3 glow = vec3(0.0);
   float cover = 0.0;
-  float closest = aim;
   bool fell = false;
+  bool circling = false;
 
-  if (closest > FAR && dot(pos, pos) > FAR * FAR) {
+  if (aim > FAR && dot(pos, pos) > FAR * FAR) {
     // Passes wide of everything: no disk, no haze, just a bend.
     vel = bendRest(pos, vel);
   } else {
-    closest = 1e9;
     float travelled = 0.0;
     for (int i = 0; i < MAX_STEPS; i++) {
       float r2 = dot(pos, pos);
@@ -227,6 +247,9 @@ void main() {
       float dt = r * mix(0.055, 0.12, smoothstep(4.0, 10.0, r));
       vel += -1.5 * h2 * pos / (r2 * r2 * r) * dt;
       vec3 next = pos + vel * dt;
+      // Once past its closest approach the ray is on its way out; for a wound
+      // ray, what it meets from here on is the ring's to draw.
+      float keep = dot(pos, vel) > 0.0 ? 1.0 - wound : 1.0;
 
       if (pos.y * next.y < 0.0) {
         float t = pos.y / (pos.y - next.y);
@@ -236,6 +259,7 @@ void main() {
         // stretched on the disk when it arrives at a glancing angle.
         float footprint = (travelled + dt * t) * pixel / max(abs(dir.y), 0.04);
         vec4 d = disk(hit, dir, footprint);
+        d.a *= keep;
         light += (1.0 - cover) * d.rgb * d.a;
         cover += (1.0 - cover) * d.a;
       }
@@ -246,17 +270,21 @@ void main() {
         if (rr < R_OUT) {
           float q = R_IN / max(rr, R_IN);
           float haze = exp(-abs(next.y) * 3.0) * smoothstep(R_IN, R_IN * 1.3, rr) * (1.0 - smoothstep(R_IN * 1.2, R_OUT, rr));
-          glow += (1.0 - cover) * vec3(1.0, 0.6, 0.28) * haze * q * sqrt(q) * dt * 0.06;
+          glow += keep * (1.0 - cover) * vec3(1.0, 0.6, 0.28) * haze * q * sqrt(q) * dt * 0.06;
         }
       }
 
       pos = next;
       travelled += dt;
       float nr = length(pos);
-      closest = min(closest, nr);
-      if (nr < 1.01 || i == MAX_STEPS - 1) {
-        // Inside the horizon, or circling so close to it that it might as well be.
+      if (nr < 1.45 && dot(pos, vel) < 0.0) {
+        // Inside the orbit at r = 1.5 and still heading in: nothing can stop it now.
         fell = true;
+        break;
+      }
+      if (i == MAX_STEPS - 1) {
+        // Still circling when the steps run out: it belongs to the ring.
+        circling = true;
         break;
       }
       if (cover > 0.95) break;
@@ -267,15 +295,20 @@ void main() {
     }
   }
 
-  // Haze in front of the hole would fog its shadow; keep the shadow black.
-  vec3 color = light + glow * (fell ? 0.2 : 1.0);
-  if (!fell) {
-    // Light that skimmed the orbit at r = 1.5 piles up into a thin bright ring.
-    float k = (closest - 1.5) * 3.0;
-    float ring = exp(-k * k);
-    vec3 behind = sky(normalize(vel), pixel) + vec3(1.0, 0.82, 0.6) * ring * 0.35;
-    // The shadow's rim fades in over about a pixel, so its edge is smooth rather than stepped.
-    color += behind * (1.0 - cover) * smoothstep(B_EDGE - 0.5 * max(aimStep, 1e-4), B_EDGE + max(aimStep, 1e-4), aim);
+  // Haze in front of the hole would fog its shadow; keep the shadow dark.
+  vec3 color = light + glow * mix(0.2, 1.0, open);
+  if (!fell && !circling) color += sky(normalize(vel), pixel) * (1.0 - cover) * open * (1.0 - wound);
+  if (inbound) {
+    // Light that skims the orbit at r = 1.5 piles up in a ring hugging the
+    // shadow: a soft glow, with a fine bright line at its inner edge, the sum
+    // of the ever thinner images of the disk wound into it.
+    float perAngle = aimStep * uFocal; // aim per radian on screen, here
+    float past = max(aim - edgeAim, 0.0);
+    float lineWidth = max(RING_LINE * perAngle, 1.25 * aimStep);
+    float across = (past - 0.6 * lineWidth) / lineWidth;
+    float line = exp(-2.0 * across * across) * (RING_LINE * perAngle / lineWidth);
+    float ring = 0.32 * exp(-past / (RING_GLOW * perAngle)) + 0.55 * line;
+    color += vec3(1.0, 0.82, 0.6) * ring * (1.0 - cover) * open;
   }
 
   color = aces(color * uExposure);
