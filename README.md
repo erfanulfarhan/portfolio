@@ -6,7 +6,9 @@ hole, falls into it, and comes out among the work.
 ## What happens on the page
 
 - **Intro.** The EHF mark acquires focus, the brackets lock on, and a
-  seven-blade aperture opens onto the sky.
+  seven-blade aperture opens onto the sky. Where the browser holds the music
+  back, it ends on the black hole with "Click anywhere to enter", and that
+  click starts the music and brings in the page.
 - **Display.** Corner brackets frame the screen, with a mission clock, a counter
   for the current section and a Sound switch. On a mouse, a reticle trails the
   pointer and locks onto anything you can click.
@@ -41,9 +43,11 @@ and screenshots in place of the recordings.
 
 The background music is `public/audio/soundtrack.m4a`, an 85-second loop that
 builds into the most intense part of the track, played through Web Audio with
-fades (`src/lib/soundtrack.ts`). It is on by default: it starts as the intro
-opens wherever the browser allows sound on arrival, and otherwise with the
-visitor's first click, tap or key press. Turning it off is remembered.
+fades (`src/lib/soundtrack.ts`). It is on by default. Browsers only allow sound
+after a click, tap or key press, so where it cannot start on arrival the intro
+waits on "Click anywhere to enter" (`src/components/Boot.tsx`) and that click
+starts it. Turning it off with the switch is remembered, and the intro then
+does not ask.
 
 ## Stack
 

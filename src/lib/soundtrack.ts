@@ -167,28 +167,31 @@ class Soundtrack {
   /**
    * Starts the music without waiting for a click, if this browser allows it
    * (some do once the visitor allows sound for the site). It asks with a
-   * silent test play of the recording, so a browser that says no logs nothing
-   * and the first click still starts it.
+   * silent test play of the recording, so a browser that says no logs nothing.
+   * The answer tells the intro whether to ask the visitor in: 'blocked' means
+   * the music needs a click, tap or key press first.
    */
-  async tryAutoplay() {
-    if (!this.wanted || this.playing || savingData() || !SOUNDTRACK_URL) return;
+  async tryAutoplay(): Promise<'playing' | 'blocked' | 'off'> {
+    if (!this.wanted || savingData()) return 'off';
+    if (this.playing) return 'playing';
+    if (!SOUNDTRACK_URL) return 'blocked'; // the generated piece always waits for a click
     const policy = (navigator as Navigator & { getAutoplayPolicy?: (type: string) => string }).getAutoplayPolicy?.(
       'mediaelement',
     );
-    if (policy && policy !== 'allowed') return;
+    if (policy && policy !== 'allowed') return 'blocked';
     const audio = this.element();
     audio.volume = 0;
     try {
       await audio.play();
     } catch {
       audio.volume = 1;
-      return; // not without a click: the first one will start it
+      return 'blocked';
     }
-    if (this.playing) return; // a click got there first
+    if (this.playing) return 'playing'; // a click got there first
     if (!this.wanted) {
       audio.pause();
       audio.volume = 1;
-      return;
+      return 'off';
     }
     this.unlisten();
     this.start();
@@ -201,8 +204,19 @@ class Soundtrack {
       if (!running() && this.playing) {
         this.stop();
         if (this.wanted) this.listen();
+        return 'blocked';
       }
     }
+    return 'playing';
+  }
+
+  /**
+   * The intro's "click anywhere to enter". Called inside that click, tap or key
+   * press, which is what every browser needs before it lets the music play.
+   */
+  begin() {
+    this.unlisten();
+    if (this.wanted && !this.playing && !savingData()) this.start();
   }
 
   /** The Sound switch: silences the music if it is playing, otherwise starts it now. */

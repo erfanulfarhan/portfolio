@@ -273,6 +273,92 @@
   .boot.is-locked .boot__status-dot {
     background: var(--accent);
   }
+  /* "Click anywhere to enter": the whole screen is the target, the prompt
+     sits where the name is about to appear. */
+  .gate {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--light);
+    text-align: left;
+    cursor: pointer;
+  }
+  .gate[hidden] {
+    display: none;
+  }
+  /* It takes focus as it appears, so Enter or any key goes in; the prompt
+     itself is the indicator, and any key press enters. */
+  .gate:focus-visible {
+    outline: none;
+  }
+  .gate__prompt {
+    position: absolute;
+    left: var(--gutter);
+    right: var(--gutter);
+    top: calc(clamp(6.5rem, 16vh, 9rem) + 2.4rem);
+    display: grid;
+    justify-items: start;
+    gap: 1rem;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.9s var(--ease-out), transform 0.9s var(--ease-out);
+  }
+  .gate.is-shown .gate__prompt {
+    opacity: 1;
+    transform: none;
+  }
+  .gate__title {
+    max-width: 11em;
+    font-size: clamp(2rem, 4.2vw, 3.4rem);
+    font-weight: 600;
+    line-height: 1.02;
+    letter-spacing: -0.01em;
+    animation: breathe 3.2s ease-in-out infinite;
+  }
+  .gate__note {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--haze);
+  }
+  .gate__bars {
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 12px;
+    color: var(--amber);
+  }
+  .gate__bars i {
+    width: 2px;
+    height: 12px;
+    border-radius: 1px;
+    background: currentColor;
+    transform-origin: bottom;
+    animation: eq 1.2s ease-in-out infinite;
+  }
+  .gate__bars i:nth-child(2) {
+    animation-delay: -0.45s;
+  }
+  .gate__bars i:nth-child(3) {
+    animation-delay: -0.8s;
+  }
+  .gate__bars i:nth-child(4) {
+    animation-delay: -0.25s;
+  }
+  @media (min-width: 900px) and (min-aspect-ratio: 21/20) {
+    .gate__prompt {
+      top: 50%;
+      right: auto;
+      translate: 0 -50%;
+    }
+  }
 
   /* ---------------- page backdrop ---------------- */
   .page-bg {
@@ -333,7 +419,7 @@
     --accent: var(--amber-ink);
     color: var(--ink);
   }
-  html:is([data-intro='covered'], [data-intro='filled']) :is(.viewfinder, .hud, .hud__met, .hud__count) {
+  html:is([data-intro='covered'], [data-intro='filled'], [data-gate]) :is(.viewfinder, .hud, .hud__met, .hud__count) {
     opacity: 0;
     visibility: hidden;
   }
@@ -842,6 +928,30 @@
     font-size: 0.75rem;
     color: var(--haze);
     white-space: nowrap;
+  }
+  /* While the intro waits for "click anywhere to enter", only the black hole
+     shows. The copy's children fade in on the click; the copy and the hint
+     themselves belong to the scroll timeline, so they are left alone. Hiding
+     has no transition, so nothing flickers as the aperture opens. */
+  html[data-gate] .hero__copy > * {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(18px);
+  }
+  html[data-gate] .hero__hint {
+    visibility: hidden;
+  }
+  html:not([data-gate]) .hero__copy > * {
+    transition: opacity 0.9s var(--ease-out), transform 0.9s var(--ease-out);
+  }
+  html:not([data-gate]) .hero__copy > :nth-child(2) {
+    transition-delay: 0.07s;
+  }
+  html:not([data-gate]) .hero__copy > :nth-child(3) {
+    transition-delay: 0.14s;
+  }
+  html:not([data-gate]) .hero__copy > :nth-child(4) {
+    transition-delay: 0.21s;
   }
   @media (min-width: 900px) and (min-aspect-ratio: 21/20) {
     .hero__copy {
@@ -2949,6 +3059,15 @@
   from {
     opacity: 0;
     transform: translateY(12px) scale(0.97);
+  }
+}
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.68;
   }
 }
 @keyframes rise-in {
