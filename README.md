@@ -24,8 +24,8 @@ hole, falls into it, and comes out among the work.
 - **Mission log.** Releases and launch days from GitHub on a git graph that
   draws itself, with a steady preview of the release you point at.
 - **Contact.** A form whose send button sends a transmission across the page,
-  an assistant that answers questions about the work, and an EHF that lights up
-  under the pointer.
+  an assistant that answers questions about the work and can pass a message on,
+  and an EHF that lights up under the pointer.
 
 Smooth scrolling is Lenis and the scroll scenes are GSAP ScrollTrigger. The
 black hole is one WebGL2 fragment shader (`src/components/hero/`), loaded on
@@ -47,8 +47,25 @@ visitor's first click, tap or key press. Turning it off is remembered.
 
 ## Stack
 
-Vite, React, TypeScript, Tailwind CSS 4, GSAP, Lenis and WebGL2. Two Vercel
-functions in `api/`: `chat.js` (Groq) and `contact.js` (Brevo).
+Vite, React, TypeScript, Tailwind CSS 4, GSAP, Lenis and WebGL2. Three Vercel
+functions in `api/`: `chat.js` (Groq), `contact.js` and `transcript.js` (both
+Brevo), with the code they share in `server/`.
+
+## The assistant
+
+`api/chat.js` answers from the profile in that file. It can also pass a message
+on: when a visitor wants to hire me or needs a reply, it asks for their name,
+email and message and emails them to me with their address as reply-to. It only
+sends to an address the visitor typed in the chat.
+
+Every chat reaches my inbox too. When a visitor closes the assistant, switches
+away or leaves, the page sends the conversation to `api/transcript.js`, which
+emails it with their rough location (Vercel's city and country headers),
+device, language, time zone, where they came from, and any email or phone
+number they typed. No IP address is kept and nothing is stored on the server.
+Each answer is signed with a key derived from `GROQ_API_KEY`, and only signed
+answers are emailed, so the endpoint cannot be used to send anything the chat
+did not say. The chat panel tells visitors that I read these chats.
 
 ## Run it
 

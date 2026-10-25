@@ -2706,6 +2706,15 @@
     background: rgba(246, 164, 83, 0.12);
     color: #ffd9d4;
   }
+  .msg--note {
+    align-self: center;
+    padding: 0.25rem 0.7rem;
+    border-radius: 999px;
+    border: 1px solid rgba(246, 164, 83, 0.35);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--accent);
+  }
   .msg__dots {
     display: inline-flex;
     gap: 0.3rem;
@@ -2783,6 +2792,14 @@
   .chat__send:disabled {
     opacity: 0.45;
     cursor: default;
+  }
+  .chat__note {
+    margin: 0;
+    padding: 0 0.9rem 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    line-height: 1.45;
+    color: var(--haze);
   }
 }
 

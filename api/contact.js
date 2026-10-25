@@ -1,16 +1,12 @@
 // Contact form → email. Receives {name, email, message} and sends it to the
-// site owner via Brevo's transactional API. The visitor's address is set as
-// reply-to, so replying from the inbox goes straight back to them.
-// The Brevo key stays server-side (Vercel env var).
+// site owner via Brevo's transactional API (server/mail.js). The visitor's
+// address is set as reply-to, so replying from the inbox goes straight back to them.
 
-const BREVO = 'https://api.brevo.com/v3/smtp/email';
-const OWNER = 'erfanul100@gmail.com';
-const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+import { esc, isEmail, mailOwner } from '../server/mail.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
-  const key = process.env.BREVO_API_KEY;
-  if (!key) return res.status(500).json({ error: 'Contact is not configured yet.' });
+  if (!process.env.BREVO_API_KEY) return res.status(500).json({ error: 'Contact is not configured yet.' });
 
   let body = req.body;
   if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
@@ -19,7 +15,7 @@ export default async function handler(req, res) {
   // Honeypot: a hidden field only bots fill in. `company` is the old site's name for it.
   if (hp || company) return res.status(200).json({ ok: true });
   if (!name.trim() || !email.trim() || !message.trim()) return res.status(400).json({ error: 'All fields are required.' });
-  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return res.status(400).json({ error: 'Please enter a valid email.' });
+  if (!isEmail(email)) return res.status(400).json({ error: 'Please enter a valid email.' });
   if (message.length > 5000) return res.status(400).json({ error: 'Message is too long.' });
 
   const html =
@@ -28,22 +24,12 @@ export default async function handler(req, res) {
     `<p><b>Email:</b> ${esc(email)}</p>` +
     `<p><b>Message:</b></p><p style="white-space:pre-wrap">${esc(message)}</p>`;
 
-  try {
-    const r = await fetch(BREVO, {
-      method: 'POST',
-      headers: { 'api-key': key, 'content-type': 'application/json', accept: 'application/json' },
-      body: JSON.stringify({
-        sender: { name: 'Portfolio Contact', email: OWNER },
-        to: [{ email: OWNER, name: 'Erfanul' }],
-        replyTo: { email, name },
-        subject: `Portfolio message from ${name}`.slice(0, 180),
-        htmlContent: html,
-      }),
-    });
-    if (r.ok) return res.status(200).json({ ok: true });
-    const d = await r.json().catch(() => ({}));
-    return res.status(502).json({ error: d.message || 'Could not send right now.' });
-  } catch (e) {
-    return res.status(502).json({ error: 'Could not send right now.' });
-  }
+  const sent = await mailOwner({
+    from: 'Portfolio Contact',
+    subject: `Portfolio message from ${name}`,
+    html,
+    replyTo: { email, name },
+  });
+  if (sent.ok) return res.status(200).json({ ok: true });
+  return res.status(502).json({ error: sent.error || 'Could not send right now.' });
 }

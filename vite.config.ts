@@ -2,7 +2,7 @@ import { defineConfig, loadEnv, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 
-const API_ROUTES = new Set(['chat', 'contact']);
+const API_ROUTES = new Set(['chat', 'contact', 'transcript']);
 
 // Serves the Vercel functions in /api during `npm run dev`, so the chat and the
 // contact form behave locally the way they do in production.
