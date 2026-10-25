@@ -39,8 +39,9 @@ With reduced motion turned on (by the system, or the switch in the footer) the
 page is still: no pinning, no smooth scroll, a single frame of the black hole
 and screenshots in place of the recordings.
 
-The soundtrack is an original piece generated in the browser with Web Audio
-(`src/lib/soundtrack.ts`). It is off until the Sound switch is pressed.
+The background music is `public/audio/soundtrack.m4a`, played through Web Audio
+with fades (`src/lib/soundtrack.ts`). It is off until the Sound switch is pressed,
+and only downloads then.
 
 ## Stack
 

@@ -1,18 +1,17 @@
 /**
- * The soundtrack: an original piece for this site, played live in Web Audio.
- * Slow open-fifth piano arpeggios in A minor over a held organ chord, with a
- * sparse melody on top and a quiet clock tick, all in a long reverb. It is not
- * the Interstellar score, which is copyrighted and cannot be used here.
- *
- * To play a licensed recording instead, put the file in /public (for example
- * /public/audio/theme.mp3) and set SOUNDTRACK_URL to its path.
+ * The soundtrack. The site plays the recording at SOUNDTRACK_URL through Web
+ * Audio, so it fades in and out smoothly everywhere. With no recording set, it
+ * falls back to a piece generated live: slow open-fifth piano arpeggios in A
+ * minor over a held organ chord, a sparse melody and a quiet clock tick, all in
+ * a long reverb.
  */
-export const SOUNDTRACK_URL = '';
+export const SOUNDTRACK_URL = '/audio/soundtrack.m4a';
 
 const BPM = 63;
 const EIGHTH = 60 / BPM / 2;
 const LOOKAHEAD = 0.3; // seconds of music scheduled ahead of the clock
 const VOLUME = 0.5;
+const FILE_VOLUME = 0.9; // the recording is mastered (peaks at -2.6 dB), so it barely needs trimming
 
 type Chord = { root: number; third: number };
 // MIDI note numbers. Each chord is played root, fifth, ninth, fifth, tenth, fifth, ninth, fifth.
@@ -128,7 +127,7 @@ class Soundtrack {
     const master = this.master!;
     master.gain.cancelScheduledValues(now);
     master.gain.setValueAtTime(master.gain.value, now);
-    master.gain.linearRampToValueAtTime(VOLUME, now + 2.5);
+    master.gain.linearRampToValueAtTime(SOUNDTRACK_URL ? FILE_VOLUME : VOLUME, now + 2.5);
     if (SOUNDTRACK_URL) return this.playFile();
 
     // Start at the top of a phrase, just after now.
@@ -159,7 +158,7 @@ class Soundtrack {
     }, 1500);
   }
 
-  /* ---------- a licensed file, if one is configured ---------- */
+  /* ---------- the recording ---------- */
 
   // The file plays through the same master fader as the generated piece, so it
   // fades in and out everywhere (iOS ignores an audio element's own volume).
@@ -182,6 +181,12 @@ class Soundtrack {
 
     const master = ctx.createGain();
     master.gain.value = 0;
+    this.master = master;
+    // A finished recording needs no help: straight out, through the fader only.
+    if (SOUNDTRACK_URL) {
+      master.connect(ctx.destination);
+      return ctx;
+    }
     const comp = ctx.createDynamicsCompressor();
     comp.threshold.value = -20;
     comp.ratio.value = 3;
@@ -192,8 +197,6 @@ class Soundtrack {
     floor.type = 'highpass';
     floor.frequency.value = 45;
     master.connect(floor).connect(comp).connect(ctx.destination);
-    this.master = master;
-    if (SOUNDTRACK_URL) return ctx;
 
     // Everything plays into one bus: part of it dry, part into a long hall.
     const bus = ctx.createGain();

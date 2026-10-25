@@ -163,7 +163,7 @@ export function Hud() {
               type="button"
               className="sound"
               aria-pressed={sound}
-              title="An original piano piece, written for this site"
+              title="Background music"
               onClick={toggleSound}
             >
               <span className="sound__bars" aria-hidden="true">
