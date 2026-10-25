@@ -64,11 +64,16 @@ const ARP = {
 
 const freq = (midi: number) => 440 * Math.pow(2, (midi - 69) / 12);
 
-const WANT_KEY = 'sound';
+// A visitor's "off" is kept between visits under this name. It was 'sound'
+// before the music became on by default, and an "off" saved then (from the old
+// switch or the short-lived "Without sound" button) no longer counts.
+const WANT_KEY = 'music';
+const RETIRED_KEYS = ['sound'];
 
 /** The music is on unless this visitor has turned it off before. */
 function readWanted() {
   try {
+    RETIRED_KEYS.forEach((key) => localStorage.removeItem(key));
     return localStorage.getItem(WANT_KEY) !== 'off';
   } catch {
     return true;
