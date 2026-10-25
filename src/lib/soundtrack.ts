@@ -64,6 +64,29 @@ const ARP = {
 
 const freq = (midi: number) => 440 * Math.pow(2, (midi - 69) / 12);
 
+const WANT_KEY = 'sound';
+
+/** The music is on unless this visitor has turned it off before. */
+function readWanted() {
+  try {
+    return localStorage.getItem(WANT_KEY) !== 'off';
+  } catch {
+    return true;
+  }
+}
+
+function saveWanted(on: boolean) {
+  try {
+    if (on) localStorage.removeItem(WANT_KEY);
+    else localStorage.setItem(WANT_KEY, 'off');
+  } catch {
+    // Storage can be blocked; the choice then lasts for this visit only.
+  }
+}
+
+// The inputs every browser accepts as the visitor's go-ahead for sound.
+const GO_AHEAD = ['pointerdown', 'pointerup', 'keydown', 'touchend'] as const;
+
 class Soundtrack {
   private ctx: AudioContext | null = null;
   private master: GainNode | null = null;
@@ -77,6 +100,9 @@ class Soundtrack {
   private nextTime = 0;
   private section = 0;
   private playing = false;
+  private wanted = readWanted();
+  private waiting = false;
+  private except: Element | null = null;
   private audio: HTMLAudioElement | null = null;
   private readonly listeners = new Set<() => void>();
 
@@ -97,7 +123,12 @@ class Soundtrack {
     return this.playing;
   }
 
-  /** Tells `listener` whenever the music starts or stops, including when a file fails to play. */
+  /** On unless the visitor turned it off, even while waiting for their first click. */
+  get isWanted() {
+    return this.wanted;
+  }
+
+  /** Tells `listener` whenever the music starts or stops, or the visitor changes their mind. */
   subscribe(listener: () => void) {
     this.listeners.add(listener);
     return () => {
@@ -105,14 +136,62 @@ class Soundtrack {
     };
   }
 
-  private setPlaying(on: boolean) {
-    if (this.playing === on) return;
-    this.playing = on;
+  private emit() {
     this.listeners.forEach((listener) => listener());
   }
 
-  /** Call from a click: browsers only let sound start in response to one. */
-  play() {
+  private setPlaying(on: boolean) {
+    if (this.playing === on) return;
+    this.playing = on;
+    this.emit();
+  }
+
+  /**
+   * On by default. Browsers allow sound only after the visitor's first click,
+   * tap or key press, so the music starts on that, or at once if this page
+   * may already play sound. A visitor who turned it off stays off, and one
+   * whose browser is saving data is not started for them. `except` is the
+   * Sound switch, which handles its own clicks.
+   */
+  arm(except: Element | null) {
+    this.except = except;
+    const saving = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData;
+    if (!this.wanted || this.playing || saving) return;
+    const activation = (navigator as Navigator & { userActivation?: { hasBeenActive: boolean } }).userActivation;
+    if (activation?.hasBeenActive) this.start();
+    else this.listen();
+  }
+
+  /** The Sound switch: silences the music if it is playing, otherwise starts it now. */
+  toggle() {
+    this.unlisten();
+    this.wanted = !this.playing;
+    saveWanted(this.wanted);
+    if (this.wanted) this.start();
+    else this.stop();
+    this.emit();
+  }
+
+  private listen() {
+    if (this.waiting) return;
+    this.waiting = true;
+    GO_AHEAD.forEach((type) => window.addEventListener(type, this.goAhead, { capture: true, passive: true }));
+  }
+
+  private unlisten() {
+    if (!this.waiting) return;
+    this.waiting = false;
+    GO_AHEAD.forEach((type) => window.removeEventListener(type, this.goAhead, { capture: true }));
+  }
+
+  private goAhead = (e: Event) => {
+    if (this.except && e.target instanceof Node && this.except.contains(e.target)) return;
+    if (e instanceof KeyboardEvent && e.key === 'Escape') return;
+    this.unlisten();
+    if (this.wanted && !this.playing) this.start();
+  };
+
+  private start() {
     if (this.playing) return;
     let ctx: AudioContext;
     try {
@@ -139,7 +218,7 @@ class Soundtrack {
     this.schedule();
   }
 
-  stop() {
+  private stop() {
     if (!this.playing || !this.ctx) return;
     this.setPlaying(false);
     const ctx = this.ctx;
@@ -169,7 +248,11 @@ class Soundtrack {
       this.audio.loop = true;
       ctx.createMediaElementSource(this.audio).connect(this.master!);
     }
-    this.audio.play().catch(() => this.stop());
+    // Refused (the input was not a go-ahead in this browser): wait for the next one.
+    this.audio.play().catch(() => {
+      this.stop();
+      if (this.wanted) this.listen();
+    });
   }
 
   /* ---------- the generated piece ---------- */

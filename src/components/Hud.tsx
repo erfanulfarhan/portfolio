@@ -20,7 +20,8 @@ export function Hud() {
   const [active, setActive] = useState(0);
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
-  const [sound, setSound] = useState(() => soundtrack.isPlaying);
+  const [sound, setSound] = useState(() => ({ on: soundtrack.isWanted, playing: soundtrack.isPlaying }));
+  const soundRef = useRef<HTMLButtonElement>(null);
   const frameRef = useRef<HTMLDivElement>(null);
   const timeRef = useRef<HTMLSpanElement>(null);
   const navRef = useRef<HTMLElement>(null);
@@ -113,13 +114,13 @@ export function Hud() {
     };
   }, [open]);
 
-  // The switch shows what is really playing, even if a file fails to start.
-  useEffect(() => soundtrack.subscribe(() => setSound(soundtrack.isPlaying)), []);
-
-  const toggleSound = () => {
-    if (soundtrack.isPlaying) soundtrack.stop();
-    else soundtrack.play();
-  };
+  // Music is on by default: it starts with the visitor's first click or tap.
+  // The switch shows whether it is wanted, and its bars move while it plays.
+  useEffect(() => {
+    const off = soundtrack.subscribe(() => setSound({ on: soundtrack.isWanted, playing: soundtrack.isPlaying }));
+    soundtrack.arm(soundRef.current);
+    return off;
+  }, []);
 
   const go = (id: string) => (e: MouseEvent) => {
     e.preventDefault();
@@ -160,11 +161,19 @@ export function Hud() {
           <div className="hud__end">
             <ul className="hud__links">{links('hud__link')}</ul>
             <button
+              ref={soundRef}
               type="button"
               className="sound"
-              aria-pressed={sound}
-              title="Background music"
-              onClick={toggleSound}
+              aria-pressed={sound.on}
+              data-playing={sound.playing}
+              title={
+                sound.playing
+                  ? 'Background music is on'
+                  : sound.on
+                    ? 'Music starts with your first click or tap'
+                    : 'Background music is off'
+              }
+              onClick={() => soundtrack.toggle()}
             >
               <span className="sound__bars" aria-hidden="true">
                 <i />
