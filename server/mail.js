@@ -37,8 +37,11 @@ export async function mailOwner({ from, subject, html, replyTo, once }) {
     if (r.ok) return { ok: true };
     const d = await r.json().catch(() => ({}));
     if (d.code === 'duplicate_parameter' && once) return { ok: true, duplicate: true };
-    return { ok: false, error: d.message || '' };
-  } catch {
-    return { ok: false, error: '' };
+    // Brevo's reason goes to the function log, not to the visitor.
+    console.error(`Brevo refused "${payload.subject}": ${r.status} ${d.code || ''} ${d.message || ''}`);
+    return { ok: false };
+  } catch (e) {
+    console.error(`Brevo could not be reached for "${payload.subject}": ${e}`);
+    return { ok: false };
   }
 }

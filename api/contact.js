@@ -31,5 +31,6 @@ export default async function handler(req, res) {
     replyTo: { email, name },
   });
   if (sent.ok) return res.status(200).json({ ok: true });
-  return res.status(502).json({ error: sent.error || 'Could not send right now.' });
+  // The page adds the email address to write to instead.
+  return res.status(502).json({ error: 'The message could not be sent right now.' });
 }
