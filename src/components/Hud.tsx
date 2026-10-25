@@ -113,12 +113,20 @@ export function Hud() {
     };
   }, [open]);
 
-  // Music is on by default: it starts with the visitor's first click or tap.
-  // The switch shows whether it is wanted, and its bars move while it plays.
+  // Music is on by default: it starts as the intro opens where the browser
+  // allows sound on arrival, and otherwise with the visitor's first click or
+  // tap. The switch shows whether it is wanted, and its bars move while it plays.
   useEffect(() => {
+    let alive = true;
     const off = soundtrack.subscribe(() => setSound({ on: soundtrack.isWanted, playing: soundtrack.isPlaying }));
     soundtrack.arm();
-    return off;
+    whenIntro('lifting').then(() => {
+      if (alive) void soundtrack.tryAutoplay();
+    });
+    return () => {
+      alive = false;
+      off();
+    };
   }, []);
 
   const go = (id: string) => (e: MouseEvent) => {

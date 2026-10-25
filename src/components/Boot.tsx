@@ -8,19 +8,14 @@ import {
   unlockScroll,
   whenSkySettled,
 } from '../lib/motion';
-import { soundtrack } from '../lib/soundtrack';
 
 const BLADES = 7;
 const TAU = Math.PI * 2;
 const wait = (ms: number) => new Promise<void>((r) => window.setTimeout(r, ms));
 
-type Choice = 'sound' | 'quiet' | 'scroll';
-
 /**
  * The intro, as a telescope finding its target: the EHF mark hunts for focus,
- * the brackets lock on, and a full-screen aperture opens onto the sky. When
- * the music is wanted it asks first, because a browser lets sound start only
- * from a click: "Enter with sound" starts it as the aperture opens.
+ * the brackets lock on, and a full-screen aperture opens onto the sky.
  */
 export function Boot() {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -30,9 +25,6 @@ export function Boot() {
   const afRef = useRef<HTMLDivElement>(null);
   const markRef = useRef<HTMLParagraphElement>(null);
   const statusRef = useRef<HTMLSpanElement>(null);
-  const gateRef = useRef<HTMLDivElement>(null);
-  const enterRef = useRef<HTMLButtonElement>(null);
-  const chooseRef = useRef<(how: Choice) => void>(() => {});
 
   useEffect(() => {
     const root = rootRef.current!;
@@ -96,30 +88,6 @@ export function Boot() {
 
     const fontsReady = Promise.race([document.fonts?.ready ?? Promise.resolve(), wait(3000)]);
 
-    // Asks the visitor in. The buttons call `chooseRef` inside their click, so
-    // "Enter with sound" can start the music; scrolling means "just let me in".
-    const ask = () =>
-      new Promise<void>((resolve) => {
-        const gate = gateRef.current!;
-        const onScroll = () => chooseRef.current('scroll');
-        chooseRef.current = (how) => {
-          if (how === 'sound') soundtrack.enterWithSound();
-          else if (how === 'quiet') soundtrack.enterQuietly();
-          window.removeEventListener('wheel', onScroll);
-          window.removeEventListener('touchmove', onScroll);
-          chooseRef.current = () => {};
-          // Focus would otherwise stay on a button that is about to vanish.
-          (document.activeElement as HTMLElement | null)?.blur();
-          root.classList.remove('is-asking');
-          resolve();
-        };
-        window.addEventListener('wheel', onScroll, { passive: true });
-        window.addEventListener('touchmove', onScroll, { passive: true });
-        root.classList.add('is-asking');
-        gate.hidden = false;
-        enterRef.current?.focus({ preventScroll: true });
-      });
-
     const run = async () => {
       await fontsReady;
       if (cancelled) return;
@@ -128,8 +96,6 @@ export function Boot() {
       if (reducedMotion) {
         status.textContent = 'Ready';
         setIntro('filled');
-        if (soundtrack.needsGoAhead) await ask();
-        if (cancelled) return;
         setIntro('lifting');
         await play(gsap.to(root, { opacity: 0, duration: 0.4, ease: 'power1.out' }));
         if (!cancelled) finish();
@@ -157,8 +123,6 @@ export function Boot() {
 
       await Promise.all([whenSkySettled(6000), wait(450)]);
       if (cancelled) return;
-      if (soundtrack.needsGoAhead) await ask();
-      if (cancelled) return;
       setIntro('lifting');
 
       const dMax = Math.hypot(window.innerWidth, window.innerHeight) / 2 + 60;
@@ -175,8 +139,6 @@ export function Boot() {
 
     return () => {
       cancelled = true;
-      chooseRef.current = () => {};
-      root.classList.remove('is-asking');
       tweens.forEach((t) => t.kill());
       window.removeEventListener('resize', draw);
       root.classList.remove('is-ready', 'is-locked');
@@ -185,8 +147,8 @@ export function Boot() {
   }, []);
 
   return (
-    <div className="boot" ref={rootRef}>
-      <svg className="boot__iris" aria-hidden="true">
+    <div className="boot" ref={rootRef} aria-hidden="true">
+      <svg className="boot__iris">
         <defs>
           <radialGradient id="boot-metal" cx="50%" cy="50%" r="70%">
             <stop offset="0" stopColor="#0e121b" />
@@ -201,7 +163,7 @@ export function Boot() {
         </g>
       </svg>
       <div className="boot__subject" ref={subjectRef}>
-        <div className="boot__focus" aria-hidden="true">
+        <div className="boot__focus">
           <div className="boot__af" ref={afRef}>
             <span className="corners" />
           </div>
@@ -209,27 +171,11 @@ export function Boot() {
             EHF<span className="boot__dot" />
           </p>
         </div>
-        <p className="boot__name" aria-hidden="true">
-          Erfanul Hakim Farhan
-        </p>
-        <p className="boot__status" aria-hidden="true">
+        <p className="boot__name">Erfanul Hakim Farhan</p>
+        <p className="boot__status">
           <span className="boot__status-dot" />
           <span ref={statusRef}>Acquiring</span>
         </p>
-        <div className="boot__gate" ref={gateRef} data-sound-control hidden>
-          <button type="button" className="boot__enter" ref={enterRef} onClick={() => chooseRef.current('sound')}>
-            <span className="boot__bars" aria-hidden="true">
-              <i />
-              <i />
-              <i />
-              <i />
-            </span>
-            Enter with sound
-          </button>
-          <button type="button" className="boot__quiet" onClick={() => chooseRef.current('quiet')}>
-            Without sound
-          </button>
-        </div>
       </div>
     </div>
   );

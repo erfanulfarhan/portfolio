@@ -271,81 +271,6 @@
     background: var(--accent);
   }
 
-  /* Asking the visitor in, so the music may start with their click. */
-  .boot.is-asking .boot__status {
-    display: none;
-  }
-  .boot__gate {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.75rem;
-    margin-top: 1.1rem;
-    pointer-events: auto;
-    animation: gate-in 0.6s var(--ease-out) both;
-  }
-  .boot__gate[hidden] {
-    display: none;
-  }
-  .boot__enter {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.7rem;
-    min-height: 3rem;
-    padding: 0.85rem 1.5rem;
-    border: 0;
-    border-radius: 999px;
-    background: var(--light);
-    color: var(--ink);
-    font-size: 0.9375rem;
-    font-weight: 600;
-    cursor: pointer;
-    animation: invite 2.4s ease-out 0.6s infinite;
-    transition: background-color 0.3s;
-  }
-  .boot__enter:hover {
-    background: #fff;
-  }
-  .boot__bars {
-    display: inline-flex;
-    align-items: flex-end;
-    gap: 2px;
-    height: 13px;
-  }
-  .boot__bars i {
-    width: 2px;
-    height: 13px;
-    border-radius: 1px;
-    background: var(--amber-ink);
-    transform-origin: bottom;
-    animation: eq 1.2s ease-in-out infinite;
-  }
-  .boot__bars i:nth-child(2) {
-    animation-delay: -0.45s;
-  }
-  .boot__bars i:nth-child(3) {
-    animation-delay: -0.8s;
-  }
-  .boot__bars i:nth-child(4) {
-    animation-delay: -0.25s;
-  }
-  .boot__quiet {
-    min-height: 2.25rem;
-    padding: 0.3rem 0.75rem;
-    border: 0;
-    background: none;
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    color: var(--haze);
-    text-decoration: underline;
-    text-underline-offset: 3px;
-    cursor: pointer;
-    transition: color 0.2s;
-  }
-  .boot__quiet:hover {
-    color: var(--light);
-  }
-
   /* ---------------- page backdrop ---------------- */
   .page-bg {
     position: fixed;
@@ -2903,21 +2828,6 @@
   to {
     opacity: 1;
     transform: none;
-  }
-}
-@keyframes invite {
-  0% {
-    box-shadow: 0 0 0 0 rgba(246, 164, 83, 0.5);
-  }
-  70%,
-  100% {
-    box-shadow: 0 0 0 16px rgba(246, 164, 83, 0);
-  }
-}
-@keyframes gate-in {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
   }
 }
 @keyframes eq {

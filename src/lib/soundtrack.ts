@@ -105,6 +105,7 @@ class Soundtrack {
   private wanted = readWanted();
   private waiting = false;
   private audio: HTMLAudioElement | null = null;
+  private routed = false;
   private readonly listeners = new Set<() => void>();
 
   constructor() {
@@ -148,38 +149,55 @@ class Soundtrack {
   }
 
   /**
-   * Whether the intro should ask the visitor in: music is wanted, but this
-   * page may not make a sound until they click, tap or press a key.
-   */
-  get needsGoAhead() {
-    return this.wanted && !this.playing && !savingData();
-  }
-
-  /**
-   * On by default. Browsers allow sound only after the visitor's first click,
-   * tap or key press, so the music starts on that. A visitor who turned it
-   * off stays off, and one whose browser is saving data is not started for them.
+   * On by default. Where the browser allows sound on arrival, `tryAutoplay`
+   * starts the music as the page opens; everywhere else it starts with the
+   * visitor's first click, tap or key press. A visitor who turned it off stays
+   * off, and one whose browser is saving data is not started for them.
    */
   arm() {
     if (!this.wanted || this.playing || savingData()) return;
     this.listen();
   }
 
-  /** The intro's "Enter with sound". Call it inside the click: that is what lets sound start. */
-  enterWithSound() {
+  /**
+   * Starts the music without waiting for a click, if this browser allows it
+   * (some do once the visitor allows sound for the site). It asks with a
+   * silent test play of the recording, so a browser that says no logs nothing
+   * and the first click still starts it.
+   */
+  async tryAutoplay() {
+    if (!this.wanted || this.playing || savingData() || !SOUNDTRACK_URL) return;
+    const policy = (navigator as Navigator & { getAutoplayPolicy?: (type: string) => string }).getAutoplayPolicy?.(
+      'mediaelement',
+    );
+    if (policy && policy !== 'allowed') return;
+    const audio = this.element();
+    audio.volume = 0;
+    try {
+      await audio.play();
+    } catch {
+      audio.volume = 1;
+      return; // not without a click: the first one will start it
+    }
+    if (this.playing) return; // a click got there first
+    if (!this.wanted) {
+      audio.pause();
+      audio.volume = 1;
+      return;
+    }
     this.unlisten();
-    this.wanted = true;
-    saveWanted(true);
     this.start();
-    this.emit();
-  }
-
-  /** The intro's "Without sound": off now, and remembered for later visits. */
-  enterQuietly() {
-    this.unlisten();
-    this.wanted = false;
-    saveWanted(false);
-    this.emit();
+    // A browser may allow the page's audio yet hold Web Audio back until a click.
+    const ctx = this.ctx;
+    // Read afresh each time: the state changes while we wait.
+    const running = () => ctx?.state === 'running';
+    if (ctx && !running()) {
+      await Promise.race([ctx.resume().catch(() => {}), new Promise((r) => setTimeout(r, 600))]);
+      if (!running() && this.playing) {
+        this.stop();
+        if (this.wanted) this.listen();
+      }
+    }
   }
 
   /** The Sound switch: silences the music if it is playing, otherwise starts it now. */
@@ -205,7 +223,7 @@ class Soundtrack {
   }
 
   private goAhead = (e: Event) => {
-    // The Sound switch and the intro's buttons decide for themselves.
+    // The Sound switch decides for itself.
     if (e.target instanceof Element && e.target.closest('[data-sound-control]')) return;
     if (e instanceof KeyboardEvent && e.key === 'Escape') return;
     this.unlisten();
@@ -260,17 +278,25 @@ class Soundtrack {
 
   /* ---------- the recording ---------- */
 
-  // The file plays through the same master fader as the generated piece, so it
-  // fades in and out everywhere (iOS ignores an audio element's own volume).
-  private playFile() {
-    const ctx = this.ctx!;
+  private element() {
     if (!this.audio) {
       this.audio = new Audio(SOUNDTRACK_URL);
       this.audio.loop = true;
-      ctx.createMediaElementSource(this.audio).connect(this.master!);
     }
+    return this.audio;
+  }
+
+  // The file plays through the same master fader as the generated piece, so it
+  // fades in and out everywhere (iOS ignores an audio element's own volume).
+  private playFile() {
+    const audio = this.element();
+    if (!this.routed) {
+      this.ctx!.createMediaElementSource(audio).connect(this.master!);
+      this.routed = true;
+    }
+    audio.volume = 1;
     // Refused (the input was not a go-ahead in this browser): wait for the next one.
-    this.audio.play().catch(() => {
+    audio.play().catch(() => {
       this.stop();
       if (this.wanted) this.listen();
     });
