@@ -134,19 +134,21 @@ async function soundAllowedNow() {
 }
 
 // iPhones play Web Audio as ambient sound, which the ring switch silences, and
-// most phones live on silent. Asking for a playback session (Safari 16.4 and
-// later) makes the music play the way a music app's does.
+// most phones live on silent. A playback session (Safari 16.4 and later) plays
+// the way a music app does. It is asked for as the page loads: a type set in
+// the same moment the sound starts only applies the next time it starts.
 const audioSession = () => (navigator as Navigator & { audioSession?: { type: string } }).audioSession;
 
 // iOS ignores an audio element's own volume, which is why the file normally
-// plays through Web Audio's fader. An iPhone too old for audio sessions would
-// keep that silent on mute, so there the element plays by itself, unfaded.
+// plays through Web Audio's fader. On an iPhone or iPad the element plays by
+// itself instead: a media element is never muted by the ring switch, and the
+// loop opens on a quiet passage, so it needs no fade in.
 let playsDirect: boolean | undefined;
 const directPlayback = () => {
   if (playsDirect === undefined) {
     const probe = document.createElement('audio');
     probe.volume = 0.5;
-    playsDirect = !audioSession() && probe.volume !== 0.5;
+    playsDirect = probe.volume !== 0.5;
   }
   return playsDirect;
 };
@@ -171,6 +173,8 @@ class Soundtrack {
   private readonly listeners = new Set<() => void>();
 
   constructor() {
+    const session = audioSession();
+    if (session) session.type = 'playback';
     document.addEventListener('visibilitychange', () => {
       if (!this.playing) return;
       if (document.hidden) {
@@ -178,9 +182,22 @@ class Soundtrack {
         this.audio?.pause();
       } else {
         void this.ctx?.resume();
-        void this.audio?.play().catch(() => {});
+        // A phone may refuse to carry on without a fresh tap.
+        void this.audio?.play().catch(() => this.halted());
       }
     });
+  }
+
+  /**
+   * The browser stopped the music by itself (a phone call, a refused resume):
+   * the switch stops showing it as playing, and the next tap starts it again.
+   */
+  private halted() {
+    if (!this.playing) return;
+    this.setPlaying(false);
+    window.clearInterval(this.timer);
+    void this.ctx?.suspend();
+    if (this.wanted) this.listen();
   }
 
   get isPlaying() {
@@ -292,8 +309,12 @@ class Soundtrack {
 
   private start() {
     if (this.playing) return;
-    const session = audioSession();
-    if (session) session.type = 'playback';
+    if (SOUNDTRACK_URL && directPlayback()) {
+      // An iPhone or iPad: the element plays by itself (see directPlayback).
+      this.setPlaying(true);
+      window.clearTimeout(this.sleep);
+      return this.playFile();
+    }
     let ctx: AudioContext;
     try {
       ctx = this.ensureContext();
@@ -320,7 +341,14 @@ class Soundtrack {
   }
 
   private stop() {
-    if (!this.playing || !this.ctx) return;
+    if (!this.playing) return;
+    if (SOUNDTRACK_URL && directPlayback()) {
+      // Playing outside Web Audio, so there is no fade to wait for.
+      this.setPlaying(false);
+      this.audio?.pause();
+      return;
+    }
+    if (!this.ctx) return;
     this.setPlaying(false);
     const ctx = this.ctx;
     const master = this.master!;
@@ -329,8 +357,6 @@ class Soundtrack {
     master.gain.cancelScheduledValues(now);
     master.gain.setValueAtTime(master.gain.value, now);
     master.gain.linearRampToValueAtTime(0, now + 1.2);
-    // A file playing outside Web Audio has no fade to wait for.
-    if (SOUNDTRACK_URL && directPlayback()) this.audio?.pause();
     // Notes already scheduled keep sounding into the fade, then the context sleeps.
     window.clearTimeout(this.sleep);
     this.sleep = window.setTimeout(() => {
@@ -346,13 +372,16 @@ class Soundtrack {
     if (!this.audio) {
       this.audio = new Audio(SOUNDTRACK_URL);
       this.audio.loop = true;
+      // Paused by something other than this code while the page is in view.
+      this.audio.addEventListener('pause', () => {
+        if (!document.hidden) this.halted();
+      });
     }
     return this.audio;
   }
 
   // The file plays through the same master fader as the generated piece, so it
-  // fades in and out everywhere (iOS ignores an audio element's own volume),
-  // except on an iPhone too old to ask for a playback session (see above).
+  // fades in and out everywhere except on iPhones and iPads (see directPlayback).
   private playFile() {
     const audio = this.element();
     if (!this.routed && !directPlayback()) {
