@@ -94,6 +94,63 @@ const GO_AHEAD = ['pointerdown', 'pointerup', 'keydown', 'touchend'] as const;
 
 const savingData = () => Boolean((navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData);
 
+/**
+ * Whether the browser lets this page play sound before any click. Asked with a
+ * tenth of a second of silence made on the spot, so the answer is immediate on
+ * any connection instead of waiting for the soundtrack itself to load.
+ */
+async function soundAllowedNow() {
+  const policy = (navigator as Navigator & { getAutoplayPolicy?: (type: string) => string }).getAutoplayPolicy?.(
+    'mediaelement',
+  );
+  if (policy) return policy === 'allowed';
+  const samples = 800; // 8-bit mono at 8 kHz, every sample at the silent midpoint
+  const wav = new DataView(new ArrayBuffer(44 + samples));
+  const text = (at: number, s: string) => [...s].forEach((c, i) => wav.setUint8(at + i, c.charCodeAt(0)));
+  text(0, 'RIFF');
+  wav.setUint32(4, 36 + samples, true);
+  text(8, 'WAVEfmt ');
+  wav.setUint32(16, 16, true);
+  wav.setUint16(20, 1, true);
+  wav.setUint16(22, 1, true);
+  wav.setUint32(24, 8000, true);
+  wav.setUint32(28, 8000, true);
+  wav.setUint16(32, 1, true);
+  wav.setUint16(34, 8, true);
+  text(36, 'data');
+  wav.setUint32(40, samples, true);
+  for (let i = 0; i < samples; i += 1) wav.setUint8(44 + i, 128);
+  const url = URL.createObjectURL(new Blob([wav], { type: 'audio/wav' }));
+  const probe = new Audio(url);
+  try {
+    await probe.play();
+    probe.pause();
+    return true;
+  } catch {
+    return false;
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
+// iPhones play Web Audio as ambient sound, which the ring switch silences, and
+// most phones live on silent. Asking for a playback session (Safari 16.4 and
+// later) makes the music play the way a music app's does.
+const audioSession = () => (navigator as Navigator & { audioSession?: { type: string } }).audioSession;
+
+// iOS ignores an audio element's own volume, which is why the file normally
+// plays through Web Audio's fader. An iPhone too old for audio sessions would
+// keep that silent on mute, so there the element plays by itself, unfaded.
+let playsDirect: boolean | undefined;
+const directPlayback = () => {
+  if (playsDirect === undefined) {
+    const probe = document.createElement('audio');
+    probe.volume = 0.5;
+    playsDirect = !audioSession() && probe.volume !== 0.5;
+  }
+  return playsDirect;
+};
+
 class Soundtrack {
   private ctx: AudioContext | null = null;
   private master: GainNode | null = null;
@@ -166,33 +223,17 @@ class Soundtrack {
 
   /**
    * Starts the music without waiting for a click, if this browser allows it
-   * (some do once the visitor allows sound for the site). It asks with a
-   * silent test play of the recording, so a browser that says no logs nothing.
-   * The answer tells the intro whether to ask the visitor in: 'blocked' means
-   * the music needs a click, tap or key press first.
+   * (some do once the visitor allows sound for the site). The answer tells the
+   * intro whether to ask the visitor in: 'blocked' means the music needs a
+   * click, tap or key press first.
    */
   async tryAutoplay(): Promise<'playing' | 'blocked' | 'off'> {
     if (!this.wanted || savingData()) return 'off';
     if (this.playing) return 'playing';
     if (!SOUNDTRACK_URL) return 'blocked'; // the generated piece always waits for a click
-    const policy = (navigator as Navigator & { getAutoplayPolicy?: (type: string) => string }).getAutoplayPolicy?.(
-      'mediaelement',
-    );
-    if (policy && policy !== 'allowed') return 'blocked';
-    const audio = this.element();
-    audio.volume = 0;
-    try {
-      await audio.play();
-    } catch {
-      audio.volume = 1;
-      return 'blocked';
-    }
+    if (!(await soundAllowedNow())) return 'blocked';
     if (this.playing) return 'playing'; // a click got there first
-    if (!this.wanted) {
-      audio.pause();
-      audio.volume = 1;
-      return 'off';
-    }
+    if (!this.wanted) return 'off';
     this.unlisten();
     this.start();
     // A browser may allow the page's audio yet hold Web Audio back until a click.
@@ -251,6 +292,8 @@ class Soundtrack {
 
   private start() {
     if (this.playing) return;
+    const session = audioSession();
+    if (session) session.type = 'playback';
     let ctx: AudioContext;
     try {
       ctx = this.ensureContext();
@@ -286,6 +329,8 @@ class Soundtrack {
     master.gain.cancelScheduledValues(now);
     master.gain.setValueAtTime(master.gain.value, now);
     master.gain.linearRampToValueAtTime(0, now + 1.2);
+    // A file playing outside Web Audio has no fade to wait for.
+    if (SOUNDTRACK_URL && directPlayback()) this.audio?.pause();
     // Notes already scheduled keep sounding into the fade, then the context sleeps.
     window.clearTimeout(this.sleep);
     this.sleep = window.setTimeout(() => {
@@ -306,10 +351,11 @@ class Soundtrack {
   }
 
   // The file plays through the same master fader as the generated piece, so it
-  // fades in and out everywhere (iOS ignores an audio element's own volume).
+  // fades in and out everywhere (iOS ignores an audio element's own volume),
+  // except on an iPhone too old to ask for a playback session (see above).
   private playFile() {
     const audio = this.element();
-    if (!this.routed) {
+    if (!this.routed && !directPlayback()) {
       this.ctx!.createMediaElementSource(audio).connect(this.master!);
       this.routed = true;
     }
