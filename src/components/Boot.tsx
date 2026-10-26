@@ -122,9 +122,16 @@ export function Boot() {
           stop();
           resolve();
         };
+        // Music started some other way (a swipe that counted as a tap) lets them in too.
+        const unsubscribe = soundtrack.subscribe(() => {
+          if (!soundtrack.isPlaying) return;
+          stop();
+          resolve();
+        });
         const stop = () => {
           gate.removeEventListener('click', enter);
           window.removeEventListener('keydown', enter);
+          unsubscribe();
         };
         cleanups.push(stop);
         root.hidden = true;
@@ -151,7 +158,7 @@ export function Boot() {
         setIntro('lifting');
         await play(gsap.to(root, { opacity: 0, duration: 0.4, ease: 'power1.out' }));
         if (cancelled) return;
-        if (ask) await askIn();
+        if (ask && !soundtrack.isPlaying) await askIn();
         if (!cancelled) finish();
         return;
       }
@@ -189,7 +196,8 @@ export function Boot() {
           .to(iris, { d: dMax, twist: -0.65, duration: 1.15, ease: 'power3.inOut', onUpdate: draw }, 0.2),
       );
       if (cancelled) return;
-      if (ask) await askIn();
+      // A tap while the aperture opened may have started the music already.
+      if (ask && !soundtrack.isPlaying) await askIn();
       if (!cancelled) finish();
     };
 
