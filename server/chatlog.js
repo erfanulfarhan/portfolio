@@ -68,8 +68,25 @@ function describeAgent(ua, touch) {
 const text = (v, max) => (typeof v === 'string' ? v.slice(0, max) : '');
 
 /**
- * Who is chatting, roughly: Vercel's geolocation headers (city and country, no
- * IP address is kept), the browser, and what the page itself reported.
+ * The visitor's public IP address. Vercel sets these headers itself and
+ * overwrites any a visitor sends, so they cannot be faked; `npm run dev` has
+ * only the socket.
+ */
+function clientIp(req, header) {
+  const raw = header('x-vercel-forwarded-for') || header('x-forwarded-for') || header('x-real-ip') || req.socket?.remoteAddress || '';
+  const ip = raw.split(',')[0].trim().replace(/^::ffff:/, '');
+  return /^[0-9a-f:.]{3,45}$/i.test(ip) ? ip : '';
+}
+
+const coordinate = (v, limit) => {
+  const n = Number.parseFloat(v);
+  return Number.isFinite(n) && Math.abs(n) <= limit ? n : null;
+};
+
+/**
+ * Who is chatting: their IP address and what Vercel derives from it (city,
+ * postal code, rough coordinates, the network's time zone), the browser, and
+ * what the page itself reported. Used to follow up, and to deal with abuse.
  */
 export function visitorDetails(req, meta = {}) {
   const header = (name) => {
@@ -92,8 +109,14 @@ export function visitorDetails(req, meta = {}) {
   }
   const ua = header('user-agent');
   const m = meta && typeof meta === 'object' ? meta : {};
+  const city = [decode(header('x-vercel-ip-city')), header('x-vercel-ip-postal-code')].filter(Boolean).join(' ');
+  const lat = coordinate(header('x-vercel-ip-latitude'), 90);
+  const lon = coordinate(header('x-vercel-ip-longitude'), 180);
   return {
-    place: [decode(header('x-vercel-ip-city')), country].filter(Boolean).join(', '),
+    ip: clientIp(req, header),
+    place: [city, country].filter(Boolean).join(', ').slice(0, 120),
+    coords: lat !== null && lon !== null ? { lat, lon } : null,
+    netTz: text(header('x-vercel-ip-timezone'), 60),
     device: describeAgent(ua, m.touch === true),
     agent: ua.slice(0, 300),
     screen: text(m.screen, 20),
@@ -156,11 +179,27 @@ export function detailsTable(who, contacts, extra = '') {
     ...contacts.phones.map((p) => esc(p)),
   ].join(', ');
   const visitor = who.visitor ? `${esc(who.visitor)}${who.chats > 1 ? `, their ${ordinal(who.chats)} chat` : ''}` : '';
+  // The lookup page names the internet provider behind the address.
+  const ip = who.ip
+    ? `${esc(who.ip)} &nbsp;<a href="https://ipinfo.io/${encodeURIComponent(who.ip)}">who owns it</a>`
+    : 'Unknown';
+  const map = who.coords
+    ? `<a href="https://www.openstreetmap.org/?mlat=${who.coords.lat}&amp;mlon=${who.coords.lon}#map=11/${who.coords.lat}/${who.coords.lon}">` +
+      `${who.coords.lat.toFixed(3)}, ${who.coords.lon.toFixed(3)}</a> (approximate, from the IP)`
+    : '';
+  // A network in another time zone than the browser's usually means a VPN or proxy.
+  const network =
+    who.netTz && who.tz && who.netTz !== who.tz
+      ? `${esc(who.netTz)}, but the browser says ${esc(who.tz)}: likely a VPN or proxy`
+      : esc(who.netTz);
   return (
     `<table style="border-collapse:collapse;font-size:14px;margin:0 0 20px">` +
     row('Contact', reach || 'None given in the chat') +
     extra +
+    row('IP address', ip) +
     row('From', esc(who.place || 'Unknown')) +
+    row('Map', map) +
+    row('Network time', network) +
     row('Device', esc([who.device, who.screen].filter(Boolean).join(', '))) +
     row('Language', esc([who.lang, who.tz].filter(Boolean).join(', '))) +
     row('Came from', esc(referrer(who.ref))) +

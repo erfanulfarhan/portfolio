@@ -278,7 +278,7 @@ export function ChatWidget() {
             <Send size={16} />
           </button>
         </form>
-        <p className="chat__note">I read these chats, with your rough location and device, so I can follow up.</p>
+        <p className="chat__note">I read these chats, with your IP address, location and device, to follow up and to stop abuse.</p>
       </div>
 
       <button

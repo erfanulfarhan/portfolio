@@ -64,12 +64,14 @@ sends to an address the visitor typed in the chat.
 
 Every chat reaches my inbox too. When a visitor closes the assistant, switches
 away or leaves, the page sends the conversation to `api/transcript.js`, which
-emails it with their rough location (Vercel's city and country headers),
-device, language, time zone, where they came from, and any email or phone
-number they typed. No IP address is kept and nothing is stored on the server.
-Each answer is signed with a key derived from `GROQ_API_KEY`, and only signed
-answers are emailed, so the endpoint cannot be used to send anything the chat
-did not say. The chat panel tells visitors that I read these chats.
+emails it with their IP address (with a link to who owns it), the location
+Vercel derives from it (city, postal code, rough coordinates, the network's time
+zone, flagged when it differs from the browser's), device, language, where they
+came from, and any email or phone number they typed. The IP is there to deal
+with abuse. Nothing is stored on the server; it only goes to my inbox. Each
+answer is signed with a key derived from `GROQ_API_KEY`, and only signed answers
+are emailed, so the endpoint cannot be used to send anything the chat did not
+say. The chat panel tells visitors that I read these chats with their IP.
 
 ## Run it
 
