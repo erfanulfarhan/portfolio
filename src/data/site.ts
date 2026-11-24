@@ -118,7 +118,7 @@ export const projects: Project[] = [
       'A cinematic watch-tracker: accounts with cloud-synced progress, a private leaderboard, live charts and an animated UI.',
     tags: ['Supabase', 'Auth', 'Charts', 'Animation'],
     links: {
-      live: 'https://doomsday-tracker-erfanul.vercel.app',
+      live: 'https://doomsday.erfanul.me',
       repo: 'https://github.com/erfanulfarhan/doomsday-tracker',
     },
     tall: tall('doomsday'),

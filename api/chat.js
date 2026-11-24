@@ -106,7 +106,7 @@ PROJECTS
    studybuddy-ai-pi.vercel.app.
 11. Doomsday Tracker, a cinematic watch-tracker with accounts, cloud-synced
    progress, a private friends-and-family leaderboard, live stats charts, and an
-   interactive animated UI. Live at doomsday-tracker-erfanul.vercel.app.
+   interactive animated UI. Live at doomsday.erfanul.me.
 12. Cineplex Automation Platform, a Telegram bot plus a public web app that
    track cinema seat availability in real time, render seat maps, and can book
    tickets automatically the moment they go on sale. Stack: Python, Playwright.
